@@ -10,6 +10,8 @@ CREATE TYPE "FormType" AS ENUM ('CHEM', 'OGTT', 'CBC', 'BT', 'UA', 'SE', 'PT', '
 -- CreateTable
 CREATE TABLE "Profile" (
     "id" TEXT NOT NULL,
+    "userIdNum" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
     "firstName" TEXT,
     "lastName" TEXT,
     "role" "Role" NOT NULL DEFAULT 'USER',
@@ -56,6 +58,12 @@ CREATE TABLE "FormEditLock" (
 
     CONSTRAINT "FormEditLock_pkey" PRIMARY KEY ("id")
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Profile_userIdNum_key" ON "Profile"("userIdNum");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Profile_email_key" ON "Profile"("email");
 
 -- CreateIndex
 CREATE INDEX "PatientSession_createdByUserId_idx" ON "PatientSession"("createdByUserId");
