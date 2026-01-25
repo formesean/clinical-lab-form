@@ -1,5 +1,5 @@
 import { getAuthedUser, handleRouteError } from "@/lib/auth";
-import { AccountStatus, Role } from "@/lib/generated/prisma";
+import { AccountStatus, Role } from "@prisma/client";
 import { errorJson, json, noStore } from "@/lib/http";
 import { prisma } from "@/lib/prisma";
 

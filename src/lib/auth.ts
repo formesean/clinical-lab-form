@@ -1,4 +1,4 @@
-import { AccountStatus, Profile, Role } from "./generated/prisma";
+import { AccountStatus, Profile, Role } from "@prisma/client";
 import { supabaseAuth } from "./supabase";
 import { errorJson } from "./http";
 import { prisma } from '@/lib/prisma';
