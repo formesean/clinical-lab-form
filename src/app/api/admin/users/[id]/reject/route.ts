@@ -18,7 +18,7 @@ const Params = z.object({ id: z.string().min(1) });
  * - Authorization: Bearer <access_token> (required)
  *
  * Returns (JSON):
- * - { user: { id, email, userIdNum, firstName, lastName, role, status, createdAt, updatedAt } }
+ * - { user: { id, email, userIdNum, licenseNum, firstName, middleName, lastName, role, status, createdAt, updatedAt } }
  *
  * Status codes:
  * - 200 OK
@@ -42,7 +42,11 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       data: { status: AccountStatus.REJECTED },
       select: {
         id: true,
+        email: true,
+        userIdNum: true,
+        licenseNum: true,
         firstName: true,
+        middleName: true,
         lastName: true,
         role: true,
         status: true,

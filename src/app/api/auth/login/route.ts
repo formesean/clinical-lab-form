@@ -1,6 +1,8 @@
+import { ensureProfileForUser } from "@/lib/auth";
 import { errorJson, json, noStore, zodError } from "@/lib/http";
 import { prisma } from "@/lib/prisma";
 import { supabaseAuth } from "@/lib/supabase";
+import { NextResponse } from "next/server";
 import z from "zod";
 
 const Body = z.object({
@@ -19,7 +21,7 @@ const Body = z.object({
  * - password: string (required)
  *
  * Returns (JSON):
- * - { access_token, refresh_token, token_type, expires_in, expires_at }
+ * - { access_token, refresh_token, token_type, expires_in, expires_at, profile }
  *
  * Status codes:
  * - 200 OK
@@ -34,7 +36,7 @@ export async function POST(req: Request) {
 
   const profile = await prisma.profile.findUnique({
     where: { userIdNum },
-    select: { email: true },
+    select: { id: true, email: true },
   });
 
   if (!profile) {
@@ -50,13 +52,36 @@ export async function POST(req: Request) {
     return errorJson(401, "INVALID_CREDENTIALS", "Invalid credentials");
   }
 
-  return noStore(
-    json({
+  const ensuredProfile = await ensureProfileForUser({
+    id: profile.id,
+    email: profile.email,
+  });
+
+  const res = NextResponse.json(
+    {
       access_token: data.session.access_token,
       refresh_token: data.session.refresh_token,
-      token_type: data.session.token_type,
       expires_in: data.session.expires_in,
       expires_at: data.session.expires_at,
-    }),
+      token_type: data.session.token_type,
+      profile: ensuredProfile,
+    },
+    { status: 200 },
   );
+
+  const secure = process.env.NODE_ENV === "production";
+
+  res.headers.append(
+    "Set-Cookie",
+    `sb_access_token=${data.session.access_token}; Path=/; HttpOnly; SameSite=Lax; ${secure ? "Secure;" : ""} Max-Age=${Math.max(60, Number(data.session.expires_in) || 3600)}`
+  );
+
+  res.headers.append(
+    "Set-Cookie",
+    `sb_refresh_token=${data.session.refresh_token}; Path=/; HttpOnly; SameSite=Lax; ${secure ? "Secure;" : ""} Max-Age=2592000`
+  );
+
+  res.headers.set("Cache-Control", "no-store");
+
+  return res;
 }

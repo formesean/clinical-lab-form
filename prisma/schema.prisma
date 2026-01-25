@@ -37,15 +37,17 @@ enum FormType {
 }
 
 model Profile {
-  id        String        @id
-  userIdNum String        @unique
-  email     String        @unique
-  firstName String?
-  lastName  String?
-  role      Role          @default(USER)
-  status    AccountStatus @default(PENDING)
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
+  id         String        @id
+  userIdNum  String        @unique
+  licenseNum String        @unique
+  email      String        @unique
+  firstName  String?
+  middleName String?
+  lastName   String?
+  role       Role          @default(USER)
+  status     AccountStatus @default(PENDING)
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
 
   patientSessions PatientSession[] @relation("ProfilePatientSessions")
   formEditLocks   FormEditLock[]   @relation("ProfileEditLocks")

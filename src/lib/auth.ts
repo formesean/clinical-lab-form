@@ -5,13 +5,30 @@ import { prisma } from '@/lib/prisma';
 
 export type AuthedUser = { id: string, email: string | null };
 
+function parseCookie(header: string | null) {
+  if (!header) return {};
+  const out: Record<string, string> = {};
+  for (const part of header.split(";")) {
+    const [k, ...rest] = part.trim().split("=");
+    if (!k) continue;
+    out[k] = decodeURIComponent(rest.join("=") ?? "");
+  }
+  return out;
+}
+
 export async function getAuthedUser(req: Request): Promise<AuthedUser> {
-  const auth = req.headers.get("authorization") ?? "";
-  const match = auth.match(/^Bearer\s+(.+)$/i);
+  const authHeader = req.headers.get("authorization");
+  let token = authHeader?.startsWith("Bearer ") ? authHeader.slice("Bearer ".length).trim() : null;
 
-  if (!match) throw Object.assign(new Error("Missing Bearer token"), { status: 401, code: "UNAUTHENTICATED" });
+  if (!token) {
+    const cookies = parseCookie(req.headers.get("cookie"));
+    token = cookies.sb_access_token ?? null;
+  }
 
-  const token = match[1]!;
+  if (!token) {
+    throw Object.assign(new Error("Missing Bearer token"), { status: 401, code: "UNAUTHENTICATED" });
+  }
+
   const { data, error } = await supabaseAuth.auth.getUser(token);
 
   if (error || !data.user) throw Object.assign(new Error("Invalid token"), { status: 401, code: "UNAUTHENTICATED" });
@@ -21,6 +38,40 @@ export async function getAuthedUser(req: Request): Promise<AuthedUser> {
 
 export async function getProfile(userId: string) {
   return prisma.profile.findUnique({ where: { id: userId } });
+}
+
+export function getAdminEmails(): Set<string> {
+  const sources = [process.env.ADMIN_EMAILS, process.env.ADMIN_EMAIL]
+    .map((value) => value?.trim())
+    .filter(Boolean) as string[];
+  const emails = sources
+    .flatMap((value) => value.split(","))
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean);
+  return new Set(emails);
+}
+
+export async function ensureProfileForUser(user: AuthedUser) {
+  const adminEmails = getAdminEmails();
+  const userEmail = user.email?.toLowerCase() ?? null;
+  const isAdmin = !!userEmail && adminEmails.has(userEmail);
+
+  const existing = await prisma.profile.findUnique({
+    where: { id: user.id },
+    select: { id: true, role: true, status: true, updatedAt: true },
+  });
+
+  if (!existing) {
+    throw Object.assign(new Error("Profile not found"), { status: 403, code: "PROFILE_REQUIRED" });
+  }
+
+  if (!isAdmin) return existing;
+
+  return prisma.profile.update({
+    where: { id: user.id },
+    data: { role: Role.ADMIN, status: AccountStatus.APPROVED },
+    select: { id: true, role: true, status: true, updatedAt: true },
+  });
 }
 
 export function requireApproved(profile: Profile | null) {
