@@ -39,6 +39,7 @@ enum FormType {
 
 model Profile {
   id        String        @id
+  userIdNum String        @unique
   firstName String?
   lastName  String?
   role      Role          @default(USER)
