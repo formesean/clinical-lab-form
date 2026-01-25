@@ -12,7 +12,7 @@ import { prisma } from "@/lib/prisma";
  * - Authorization: Bearer <access_token> (required)
  *
  * Returns (JSON):
- * - { users: Array<{ id, email, userIdNum, firstName, lastName, role, status, createdAt, updatedAt }> }
+ * - { users: Array<{ id, email, userIdNum, licenseNum, firstName, middleName, lastName, role, status, createdAt, updatedAt }> }
  *
  * Status codes:
  * - 200 OK
@@ -31,7 +31,11 @@ export async function GET(req: Request) {
       take: 20,
       select: {
         id: true,
+        email: true,
+        userIdNum: true,
+        licenseNum: true,
         firstName: true,
+        middleName: true,
         lastName: true,
         role: true,
         status: true,
