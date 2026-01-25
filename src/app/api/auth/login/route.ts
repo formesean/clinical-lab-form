@@ -8,6 +8,24 @@ const Body = z.object({
   password: z.string().min(8).max(72),
 });
 
+/**
+ * POST /api/auth/login
+ *
+ * Logs in using userIdNum and password by mapping userIdNum -> Profile.email,
+ * then calling Supabase Auth sign-in. Returns session tokens.
+ *
+ * Body (JSON):
+ * - userIdNum: string (required)
+ * - password: string (required)
+ *
+ * Returns (JSON):
+ * - { access_token, refresh_token, token_type, expires_in, expires_at }
+ *
+ * Status codes:
+ * - 200 OK
+ * - 401 Unauthorized (invalid credentials)
+ * - 422 Unprocessable Entity (validation error)
+ */
 export async function POST(req: Request) {
   const parsed = Body.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return zodError(parsed.error);

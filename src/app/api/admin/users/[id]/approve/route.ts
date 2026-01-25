@@ -6,6 +6,27 @@ import z from "zod";
 
 const Params = z.object({ id: z.string().min(1) });
 
+/**
+ * POST /api/admin/users/:id/approve
+ *
+ * Admin-only. Sets Profile.status = APPROVED for the specified user id.
+ *
+ * Params:
+ * - id: string (required) - Profile.id (Supabase user id)
+ *
+ * Headers:
+ * - Authorization: Bearer <access_token> (required)
+ *
+ * Returns (JSON):
+ * - { user: { id, email, userIdNum, firstName, lastName, role, status, createdAt, updatedAt } }
+ *
+ * Status codes:
+ * - 200 OK
+ * - 401 Unauthorized (missing/invalid token)
+ * - 403 Forbidden (not approved / not admin)
+ * - 404 Not Found (profile not found)
+ * - 422 Unprocessable Entity (validation error)
+ */
 export async function POST(req: Request, ctx: { params: Promise<{ id: string }> | { id: string } }) {
   try {
     const user = await getAuthedUser(req);

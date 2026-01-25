@@ -3,6 +3,22 @@ import { AccountStatus } from "@prisma/client";
 import { json, noStore } from "@/lib/http";
 import { prisma } from "@/lib/prisma";
 
+/**
+ * GET /api/admin/pending
+ *
+ * Admin-only. Lists pending Profile rows (status=PENDING).
+ *
+ * Headers:
+ * - Authorization: Bearer <access_token> (required)
+ *
+ * Returns (JSON):
+ * - { users: Array<{ id, email, userIdNum, firstName, lastName, role, status, createdAt, updatedAt }> }
+ *
+ * Status codes:
+ * - 200 OK
+ * - 401 Unauthorized (missing/invalid token)
+ * - 403 Forbidden (not approved / not admin)
+ */
 export async function GET(req: Request) {
   try {
     const user = await getAuthedUser(req);

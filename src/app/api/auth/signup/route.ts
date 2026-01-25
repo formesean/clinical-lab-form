@@ -24,6 +24,29 @@ function getAdminEmails(): Set<string> {
   return new Set(emails);
 }
 
+
+/**
+ * POST /api/auth/signup
+ *
+ * Creates a Supabase Auth user and a corresponding Profile row (PENDING by default).
+ * Does NOT log the user in (no session tokens returned).
+ *
+ * Body (JSON):
+ * - email: string (required)
+ * - password: string (required, min 8)
+ * - userIdNum: string (required, unique)
+ * - firstName: string (required)
+ * - lastName: string (required)
+ *
+ * Returns (JSON):
+ * - { ok: true, message: string, profile: { id, email, userIdNum, firstName, lastName, role, status, createdAt, updatedAt } }
+ *
+ * Status codes:
+ * - 201 Created
+ * - 409 Conflict (id number/email already exists)
+ * - 422 Unprocessable Entity (validation error)
+ * - 400 Bad Request (signup failed)
+ */
 export async function POST(req: Request) {
   const parsed = Body.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return zodError(parsed.error);
