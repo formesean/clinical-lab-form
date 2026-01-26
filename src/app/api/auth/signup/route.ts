@@ -3,6 +3,7 @@ import { AccountStatus, Role } from "@prisma/client";
 import { errorJson, json, noStore, zodError } from "@/lib/http";
 import { prisma } from "@/lib/prisma";
 import { supabaseAuth } from "@/lib/supabase";
+import type { SignupRequest, SignupResponse } from "@/types/api/auth";
 import z from "zod";
 
 const Body = z.object({
@@ -43,7 +44,7 @@ export async function POST(req: Request) {
   const parsed = Body.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return zodError(parsed.error);
 
-  const { email, password, userIdNum, licenseNum, firstName, middleName, lastName } = parsed.data;
+  const { email, password, userIdNum, licenseNum, firstName, middleName, lastName }: SignupRequest = parsed.data;
   const emailNorm = email.toLowerCase();
 
   const existing = await prisma.profile.findFirst({
@@ -92,14 +93,15 @@ export async function POST(req: Request) {
     },
   });
 
-  return noStore(
-    json(
-      {
-        ok: true,
-        message: "Signed up. Please log in (and wait for approval if required).",
-        profile,
-      },
-      { status: 201 },
-    ),
-  );
+  const response: SignupResponse = {
+    ok: true,
+    message: "Signed up. Please log in (and wait for approval if required).",
+    profile: {
+      ...profile,
+      createdAt: profile.createdAt.toISOString(),
+      updatedAt: profile.updatedAt.toISOString(),
+    },
+  };
+
+  return noStore(json(response, { status: 201 }));
 }

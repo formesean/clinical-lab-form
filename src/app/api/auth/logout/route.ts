@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabaseAuth } from "@/lib/supabase";
+import type { LogoutResponse } from "@/types/api/auth";
 
 /**
  * POST /api/auth/logout
@@ -23,7 +24,8 @@ export async function POST(req: Request) {
     }
   } catch { }
 
-  const res = NextResponse.json({ success: true });
+  const response: LogoutResponse = { success: true };
+  const res = NextResponse.json(response);
 
   res.headers.append(
     "Set-Cookie",

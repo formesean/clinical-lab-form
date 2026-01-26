@@ -1,6 +1,7 @@
 import { getAuthedUser, handleRouteError } from "@/lib/auth";
 import { errorJson, json, noStore } from "@/lib/http";
 import { prisma } from "@/lib/prisma";
+import type { MeResponse } from "@/types/api/auth";
 
 /**
  * GET /api/me
@@ -11,7 +12,7 @@ import { prisma } from "@/lib/prisma";
  * - Authorization: Bearer <access_token> (required)
  *
  * Returns (JSON):
- * - { user: { id, email }, profile: { id, email, userIdNum, firstName, lastName, role, status, createdAt, updatedAt } }
+ * - { user: { id, email }, profile: { id, email, userIdNum, licenseNum, firstName, middleName, lastName, role, status, createdAt, updatedAt } }
  *
  * Status codes:
  * - 200 OK
@@ -42,12 +43,16 @@ export async function GET(req: Request) {
       return errorJson(403, "PROFILE_REQUIRED", "Profile not found. Please sign up.");
     }
 
-    return noStore(
-      json({
-        user: { id: user.id, email: user.email },
-        profile,
-      }),
-    );
+    const response: MeResponse = {
+      user: { id: user.id, email: user.email },
+      profile: {
+        ...profile,
+        createdAt: profile.createdAt.toISOString(),
+        updatedAt: profile.updatedAt.toISOString(),
+      },
+    };
+
+    return noStore(json(response));
   } catch (err) {
     return handleRouteError(err);
   }
