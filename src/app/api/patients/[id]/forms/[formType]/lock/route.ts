@@ -20,6 +20,29 @@ function ttlSeconds() {
   return Number.isFinite(v) && v >= 60 && v <= 600 ? v : 180;
 }
 
+/**
+ * POST /api/patients/:id/forms/:formType/lock
+ *
+ * Acquires or refreshes an edit lock for a form.
+ *
+ * Params:
+ * - id: string (required) - PatientSession.id
+ * - formType: FormType (required)
+ *
+ * Body (JSON):
+ * - lockToken: string (optional) - reuse existing token when refreshing
+ *
+ * Returns (JSON):
+ * - { ok: true, message: string, lockToken: string, expiresAt: string }
+ *
+ * Status codes:
+ * - 200 OK
+ * - 401 Unauthorized
+ * - 403 Forbidden
+ * - 404 Not Found
+ * - 409 Conflict (lock held by another user)
+ * - 422 Unprocessable Entity (validation error)
+ */
 export async function POST(req: Request, ctx: { params: Promise<unknown> }) {
   try {
     const user = await getAuthedUser(req);
@@ -97,6 +120,25 @@ export async function POST(req: Request, ctx: { params: Promise<unknown> }) {
   }
 }
 
+/**
+ * DELETE /api/patients/:id/forms/:formType/lock
+ *
+ * Releases an edit lock held by the caller.
+ *
+ * Params:
+ * - id: string (required) - PatientSession.id
+ * - formType: FormType (required)
+ *
+ * Body (JSON):
+ * - lockToken: string (required)
+ *
+ * Status codes:
+ * - 204 No Content
+ * - 401 Unauthorized
+ * - 403 Forbidden
+ * - 409 Conflict (lock not held by caller)
+ * - 422 Unprocessable Entity (validation error)
+ */
 export async function DELETE(req: Request, ctx: { params: Promise<unknown> }) {
   try {
     const user = await getAuthedUser(req);

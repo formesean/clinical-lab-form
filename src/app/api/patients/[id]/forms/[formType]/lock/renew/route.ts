@@ -19,6 +19,28 @@ function ttlSeconds() {
   return Number.isFinite(v) && v >= 60 && v <= 600 ? v : 180;
 }
 
+/**
+ * POST /api/patients/:id/forms/:formType/lock/renew
+ *
+ * Renews an existing edit lock held by the caller.
+ *
+ * Params:
+ * - id: string (required) - PatientSession.id
+ * - formType: FormType (required)
+ *
+ * Body (JSON):
+ * - lockToken: string (required)
+ *
+ * Returns (JSON):
+ * - { ok: true, message: string, lockToken: string, expiresAt: string }
+ *
+ * Status codes:
+ * - 200 OK
+ * - 401 Unauthorized
+ * - 403 Forbidden
+ * - 409 Conflict (lock not held by caller)
+ * - 422 Unprocessable Entity (validation error)
+ */
 export async function POST(req: Request, ctx: { params: Promise<unknown> }) {
   try {
     const user = await getAuthedUser(req);

@@ -28,6 +28,25 @@ function toFormDTO(f: LabForm): LabFormDTO {
   };
 }
 
+/**
+ * GET /api/patients/:id/forms/:formType
+ *
+ * Fetches a single LabForm by patient session and form type.
+ *
+ * Params:
+ * - id: string (required) - PatientSession.id
+ * - formType: FormType (required)
+ *
+ * Returns (JSON):
+ * - { ok: true, message: string, form: LabFormDTO }
+ *
+ * Status codes:
+ * - 200 OK
+ * - 401 Unauthorized
+ * - 403 Forbidden
+ * - 404 Not Found
+ * - 422 Unprocessable Entity (validation error)
+ */
 export async function GET(req: Request, ctx: { params: Promise<unknown> }) {
   try {
     const user = await getAuthedUser(req);
@@ -59,6 +78,31 @@ export async function GET(req: Request, ctx: { params: Promise<unknown> }) {
   }
 }
 
+/**
+ * PATCH /api/patients/:id/forms/:formType
+ *
+ * Updates a LabForm (requires a valid edit lock).
+ *
+ * Params:
+ * - id: string (required) - PatientSession.id
+ * - formType: FormType (required)
+ *
+ * Body (JSON):
+ * - lockToken: string (required)
+ * - data: unknown (required)
+ * - expectedVersion: number (optional)
+ *
+ * Returns (JSON):
+ * - { ok: true, message: string, form: LabFormDTO }
+ *
+ * Status codes:
+ * - 200 OK
+ * - 401 Unauthorized
+ * - 403 Forbidden
+ * - 404 Not Found
+ * - 409 Conflict (lock/version conflict)
+ * - 422 Unprocessable Entity (validation error)
+ */
 export async function PATCH(req: Request, ctx: { params: Promise<unknown> }) {
   try {
     const user = await getAuthedUser(req);

@@ -24,6 +24,24 @@ function toFormDTO(f: LabForm): LabFormDTO {
   };
 }
 
+/**
+ * GET /api/patients/:id/forms
+ *
+ * Lists all LabForms for a patient session.
+ *
+ * Params:
+ * - id: string (required) - PatientSession.id
+ *
+ * Returns (JSON):
+ * - { ok: true, message: string, forms: LabFormDTO[] }
+ *
+ * Status codes:
+ * - 200 OK
+ * - 401 Unauthorized
+ * - 403 Forbidden
+ * - 404 Not Found
+ * - 422 Unprocessable Entity (validation error)
+ */
 export async function GET(req: Request, ctx: { params: Promise<unknown> }) {
   try {
     const user = await getAuthedUser(req);
@@ -55,6 +73,28 @@ export async function GET(req: Request, ctx: { params: Promise<unknown> }) {
   }
 }
 
+/**
+ * POST /api/patients/:id/forms
+ *
+ * Creates or updates a LabForm for a patient session.
+ *
+ * Params:
+ * - id: string (required) - PatientSession.id
+ *
+ * Body (JSON):
+ * - formType: FormType (required)
+ * - data: unknown (optional)
+ *
+ * Returns (JSON):
+ * - { ok: true, message: string, form: LabFormDTO }
+ *
+ * Status codes:
+ * - 200 OK
+ * - 401 Unauthorized
+ * - 403 Forbidden
+ * - 404 Not Found
+ * - 422 Unprocessable Entity (validation error)
+ */
 export async function POST(req: Request, ctx: { params: Promise<unknown> }) {
   try {
     const user = await getAuthedUser(req);
