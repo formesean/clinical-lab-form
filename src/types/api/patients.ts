@@ -1,18 +1,18 @@
-import type { FormType } from "@prisma/client";
-import type { PatientHeaderData } from "@/types/domain/forms";
+import type { FormType, Sex } from "@prisma/client";
 
 export type PatientSessionDTO = {
   id: string;
+  patientIdNum: string;
+  lastName: string;
+  firstName: string;
+  middleName?: string | null;
+  dateOfBirth: string;
+  age: number;
+  sex: Sex;
+  requestingPhysician: string | null;
+  requestedForms: FormType[];
   createdAt: string;
   updatedAt: string;
-  patientData: PatientHeaderData;
-};
-
-export type LabFormSummaryDTO = {
-  id: string;
-  formType: FormType;
-  updatedAt: string;
-  version: number;
 };
 
 export type CreatePatientRequest = {
@@ -20,16 +20,15 @@ export type CreatePatientRequest = {
   lastName: string;
   firstName: string;
   middleName?: string | null;
-  dob: string;
+  dateOfBirth: string;
   age: number;
-  sex: "MALE" | "FEMALE";
+  sex: Sex;
   requestingPhysician: string;
   requestedForms: FormType[];
 };
 
 export type CreatePatientResponse = {
   patient: PatientSessionDTO;
-  forms: LabFormSummaryDTO[];
 };
 
 export type ListPatientsResponse = {
@@ -40,10 +39,10 @@ export type GetPatientResponse = {
   patient: PatientSessionDTO;
 };
 
-export type PatchPatientRequest = {
-  patientData: Partial<PatientHeaderData>;
+export type UpdatePatientRequest = Partial<Omit<CreatePatientRequest, "requestedForms">> & {
+  requestedForms?: FormType;
 };
 
-export type PatchPatientResponse = {
+export type UpdatePatientResponse = {
   patient: PatientSessionDTO;
 };
