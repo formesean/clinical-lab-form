@@ -34,7 +34,7 @@ export default function DataTable<TData, TValue>({
     return (
         <div className="overflow-hidden rounded-md border">
             <Table>
-                <TableHeader>
+                <TableHeader className="bg-[#F1F7F4]">
                     {table.getHeaderGroups().map((headerGroup) => (
                         <TableRow key={headerGroup.id}>
                             {headerGroup.headers.map((header) => {
@@ -58,6 +58,7 @@ export default function DataTable<TData, TValue>({
                             <TableRow
                                 key={row.id}
                                 data-state={row.getIsSelected() && "selected"}
+                                className="hover:bg-[#F3FAF6]"
                             >
                                 {row.getVisibleCells().map((cell) => (
                                     <TableCell key={cell.id}>

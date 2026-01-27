@@ -21,51 +21,8 @@ export default function Home() {
   const Date = "Saturday, January 24, 2026"
   const Time = "11:10:32 PM"
   return (
-    <div className="flex flex-col min-h-screen bg-white space-y-2">
-      <NavBar />
-      <Separator />
-
-      <div className="flex justify-between items-center h-16 px-20 text-black mt-5">
-        <div className="flex flex-col justify-center items-start ">
-          <h1 className="text-2xl font-bold">Patients</h1>
-          <p>Oo lage lista ni</p>
-        </div>
-        <div className="flex items-center justify-center space-x-6">
-          <div className="flex flex-col items-end">
-            <p className="">Philippine Standard Time</p>
-            <p className="font-semibold">{Date},{Time}</p>
-          </div>
-        </div>
-      </div >
-
-      <div className="flex-1 px-20">
-        <Card className="flex h-140 bg-white">
-          <CardHeader>
-            <div className="flex justify-between">
-              <a href="#" className="flex items-center space-x-2">
-                <PlusCircleIcon className="h-8 w-8" />
-                <p>Add Patient</p>
-              </a>
-              <InputGroup className="w-80">
-                <InputGroupInput placeholder="Search..." />
-                <InputGroupAddon>
-                  <SearchIcon />
-                </InputGroupAddon>
-              </InputGroup>
-            </div>
-            <Separator />
-          </CardHeader>
-          <CardContent>
-            <ScrollArea className="h-110">
-              <PatientTable />
-              <ScrollBar />
-            </ScrollArea>
-          </CardContent>
-          <CardFooter>
-
-          </CardFooter>
-        </Card>
-      </div>
+    <div className="flex flex-col min-h-screen bg-[#E6F3ED] space-y-2">
+      HELLO
     </div >
   );
 }
