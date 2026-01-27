@@ -2,6 +2,7 @@ import { getAuthedUser, getProfile, handleRouteError, requireAdmin, requireAppro
 import { AccountStatus } from "@prisma/client";
 import { json, noStore } from "@/lib/http";
 import { prisma } from "@/lib/prisma";
+import type { PendingProfilesResponse } from "@/types/api/admin";
 
 /**
  * GET /api/admin/pending
@@ -12,7 +13,7 @@ import { prisma } from "@/lib/prisma";
  * - Authorization: Bearer <access_token> (required)
  *
  * Returns (JSON):
- * - { users: Array<{ id, email, userIdNum, licenseNum, firstName, middleName, lastName, role, status, createdAt, updatedAt }> }
+ * - { pending: Array<{ id, email, userIdNum, licenseNum, firstName, middleName, lastName, role, status, createdAt, updatedAt }> }
  *
  * Status codes:
  * - 200 OK
@@ -44,7 +45,14 @@ export async function GET(req: Request) {
       }
     });
 
-    return noStore(json({ users }));
+    const pending = users.map((user) => ({
+      ...user,
+      createdAt: user.createdAt.toISOString(),
+      updatedAt: user.updatedAt.toISOString(),
+    }));
+
+    const response: PendingProfilesResponse = { pending };
+    return noStore(json(response));
   } catch (err) {
     return handleRouteError(err);
   }

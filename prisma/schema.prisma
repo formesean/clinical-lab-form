@@ -36,6 +36,11 @@ enum FormType {
   MICRO
 }
 
+enum Sex {
+  MALE
+  FEMALE
+}
+
 model Profile {
   id         String        @id
   userIdNum  String        @unique
@@ -54,17 +59,27 @@ model Profile {
 }
 
 model PatientSession {
-  id              String   @id @default(cuid())
-  createdByUserId String
-  patientData     Json
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id                  String     @id @default(cuid())
+  createdByUserId     String
+  patientIdNum        String
+  lastName            String
+  firstName           String
+  middleName          String
+  dateOfBirth         String
+  age                 Int
+  sex                 Sex
+  requestingPhysician String?
+  requestedForms      FormType[]
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
 
   createdBy Profile @relation("ProfilePatientSessions", fields: [createdByUserId], references: [id], onDelete: Restrict)
 
   labForms      LabForm[]
   formEditLocks FormEditLock[]
 
+  @@index([patientIdNum])
+  @@index([lastName, firstName])
   @@index([createdByUserId])
   @@index([updatedAt])
 }

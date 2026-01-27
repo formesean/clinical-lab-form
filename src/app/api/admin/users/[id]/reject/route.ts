@@ -2,6 +2,7 @@ import { getAuthedUser, getProfile, handleRouteError, requireAdmin, requireAppro
 import { AccountStatus } from "@prisma/client";
 import { errorJson, json, noStore, zodError } from "@/lib/http";
 import { prisma } from "@/lib/prisma";
+import type { RejectUserResponse } from "@/types/api/admin";
 import z from "zod";
 
 const Params = z.object({ id: z.string().min(1) });
@@ -18,7 +19,7 @@ const Params = z.object({ id: z.string().min(1) });
  * - Authorization: Bearer <access_token> (required)
  *
  * Returns (JSON):
- * - { user: { id, email, userIdNum, licenseNum, firstName, middleName, lastName, role, status, createdAt, updatedAt } }
+ * - { profile: { id, email, userIdNum, licenseNum, firstName, middleName, lastName, role, status, createdAt, updatedAt } }
  *
  * Status codes:
  * - 200 OK
@@ -57,7 +58,13 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
 
     if (!updated) return errorJson(404, "NOT_FOUND", "User profile not found");
 
-    return noStore(json({ user: updated }));
+    const profile = {
+      ...updated,
+      createdAt: updated.createdAt.toISOString(),
+      updatedAt: updated.updatedAt.toISOString(),
+    };
+    const response: RejectUserResponse = { profile };
+    return noStore(json(response));
   } catch (err) {
     return handleRouteError(err);
   }

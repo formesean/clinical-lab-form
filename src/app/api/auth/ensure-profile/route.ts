@@ -1,5 +1,6 @@
 import { ensureProfileForUser, getAuthedUser, handleRouteError } from "@/lib/auth";
 import { json, noStore } from "@/lib/http";
+import type { EnsureProfileResponse } from "@/types/api/auth";
 
 /**
  * POST /api/auth/ensure-profile
@@ -24,16 +25,16 @@ export async function POST(req: Request) {
     const user = await getAuthedUser(req);
     const profile = await ensureProfileForUser(user);
 
-    return noStore(
-      json({
-        profile: {
-          id: profile.id,
-          role: profile.role,
-          status: profile.status,
-          updatedAt: profile.updatedAt,
-        }
-      }),
-    );
+    const response: EnsureProfileResponse = {
+      profile: {
+        id: profile.id,
+        role: profile.role,
+        status: profile.status,
+        updatedAt: profile.updatedAt.toISOString(),
+      },
+    };
+
+    return noStore(json(response));
   } catch (err) {
     return handleRouteError(err);
   }

@@ -1,7 +1,8 @@
 import { ensureProfileForUser } from "@/lib/auth";
-import { errorJson, json, noStore, zodError } from "@/lib/http";
+import { errorJson, zodError } from "@/lib/http";
 import { prisma } from "@/lib/prisma";
 import { supabaseAuth } from "@/lib/supabase";
+import type { LoginRequest, LoginResponse } from "@/types/api/auth";
 import { NextResponse } from "next/server";
 import z from "zod";
 
@@ -32,7 +33,7 @@ export async function POST(req: Request) {
   const parsed = Body.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return zodError(parsed.error);
 
-  const { userIdNum, password } = parsed.data;
+  const { userIdNum, password }: LoginRequest = parsed.data;
 
   const profile = await prisma.profile.findUnique({
     where: { userIdNum },
@@ -57,17 +58,21 @@ export async function POST(req: Request) {
     email: profile.email,
   });
 
-  const res = NextResponse.json(
-    {
-      access_token: data.session.access_token,
-      refresh_token: data.session.refresh_token,
-      expires_in: data.session.expires_in,
-      expires_at: data.session.expires_at,
-      token_type: data.session.token_type,
-      profile: ensuredProfile,
-    },
-    { status: 200 },
-  );
+  const ensuredProfileDto = {
+    ...ensuredProfile,
+    updatedAt: ensuredProfile.updatedAt.toISOString(),
+  };
+
+  const response: LoginResponse = {
+    access_token: data.session.access_token,
+    refresh_token: data.session.refresh_token,
+    expires_in: data.session.expires_in ?? 0,
+    expires_at: data.session.expires_at ?? 0,
+    token_type: (data.session.token_type ?? "bearer") as "bearer",
+    profile: ensuredProfileDto,
+  };
+
+  const res = NextResponse.json(response, { status: 200 });
 
   const secure = process.env.NODE_ENV === "production";
 

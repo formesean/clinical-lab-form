@@ -1,5 +1,6 @@
 import { getAuthedUser, getProfile, handleRouteError, requireAdmin, requireApproved } from "@/lib/auth";
 import { errorJson, json, noStore } from "@/lib/http";
+import type { AuthzCheckResponse } from "@/types/api/authz";
 
 /**
  * GET /api/authz/check
@@ -33,13 +34,13 @@ export async function GET(req: Request) {
     requireApproved(profile);
     if (adminOnly) requireAdmin(profile);
 
-    return noStore(
-      json({
-        ok: true,
-        user: { id: user.id, email: user.email ?? null },
-        profile: { id: profile.id, role: profile.role, status: profile.status },
-      }),
-    );
+    const response: AuthzCheckResponse = {
+      ok: true,
+      user: { id: user.id, email: user.email ?? null },
+      profile: { id: profile.id, role: profile.role, status: profile.status },
+    };
+
+    return noStore(json(response));
   } catch (err) {
     return handleRouteError(err);
   }
