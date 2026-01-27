@@ -15,7 +15,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import PatientTable from "../../components/ui/PatientTable";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import PatientDirectory from "@/components/ui/PatientDirectory";
 
 export default function Home() {
   const Date = "Saturday, January 24, 2026"
@@ -38,7 +39,8 @@ export default function Home() {
         </div>
       </div >
 
-      <div className="flex-1 px-20 mt-4">
+      <div className="flex justify-center w-full px-20 space-x-5">
+        <div className="flex-1/2 mt-4">
         <Card className="flex h-140 bg-white">
           <CardHeader className="">
             <div className="flex justify-between">
@@ -57,7 +59,7 @@ export default function Home() {
           </CardHeader>
           <CardContent>
             <ScrollArea className="h-110">
-              <PatientTable />
+              <PatientDirectory />
               <ScrollBar />
             </ScrollArea>
           </CardContent>
@@ -65,7 +67,77 @@ export default function Home() {
 
           </CardFooter>
         </Card>
+        
+        </div>
+        <div className="flex-1/2 mt-4">
+        <Card className="flex h-140 bg-white w-fu">
+            <CardHeader className="">
+              <CardTitle>
+                <span className="font-bold text-xl">Patient Details</span>
+              </CardTitle>
+              <CardDescription>
+                <div className="flex flex-col space-y-2">
+                    <span>Patient ID:</span>
+                    <div className="flex space-x-6">
+                        <span>Date of Birth: April 12, 2003</span>
+                        <span>Age: 22</span>
+                        <span>Sex: Male</span>
+                    </div>  
+                </div>
+              </CardDescription>
+              <Separator/>
+          </CardHeader>
+            <CardContent>
+              <div className="flex flex-col space-y-5">
+                <div className="w-full">
+                  <Card className="">
+                      <CardContent>
+                        <Tabs>
+                          <TabsList>
+                              <TabsTrigger value="a">Microbiology</TabsTrigger>
+                              <TabsTrigger value="b">Hematology</TabsTrigger>
+                              <TabsTrigger value="c">Immuno-serology</TabsTrigger>
+                          </TabsList>
+                          <TabsContent value="a">
+                            <Card className="">
+                              <CardContent>
+                              </CardContent>
+                              <CardFooter>
+                              </CardFooter>
+                            </Card>
+                          </TabsContent>
+                          <TabsContent value="b">
+                            <Card className="">
+                              <CardContent>
+                              </CardContent>
+                              <CardFooter>
+                              </CardFooter>
+                            </Card>
+                          </TabsContent>
+                          <TabsContent value="c">
+                            <Card className="">
+                              <CardContent>
+                              </CardContent>
+                              <CardFooter>
+                              </CardFooter>
+                            </Card>
+                          </TabsContent>
+                        </Tabs>
+                      </CardContent>
+                      <CardFooter>
+
+                      </CardFooter>
+                  </Card>
+                </div>
+            </div>
+          </CardContent>
+          <CardFooter>
+
+          </CardFooter>
+        </Card>
       </div>
+      </div>
+      
     </div >
   );
 }

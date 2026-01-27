@@ -66,7 +66,8 @@ export const columns: ColumnDef<Patient>[] = [
     },
     {
         accessorKey: "dateReq",
-        header: () => <div className="text-left text-[#111827]">Date Requested</div>,
+        header: () =>
+            <div className="flex items-center text-left text-[#111827] justify-around">Date Requested</div>,
         cell: ({ row }) => <div className="text-right w-fit text-[#111827]">{row.original.dateReq}</div>
     },
     {
@@ -82,7 +83,7 @@ export const columns: ColumnDef<Patient>[] = [
                 <Info className="size-3 items" />
             </div>,
         cell: ({ row }) => (
-            <div className="flex flex-wrap gap-2 justify-center text-[#111827]">
+            <div className="flex flex-wrap gap-2 text-[#111827] px-4">
                 {row.original.tests.map((clinic) => {
                     const clinicStatus = getClinicStatus(clinic.subTests)
 
@@ -94,9 +95,9 @@ export const columns: ColumnDef<Patient>[] = [
                                 : "bg-green-300"
 
                     return (
-                        <div key={clinic.name} className="flex items-center gap-1">
-                            <div className={`rounded-full h-2.5 w-2.5 ${dotColor}`} />
-                            <Badge variant="secondary" className={`${textColors[clinic.name] || "text-gray-400"} rounded-full w-fit ${badgeColors[clinic.name] || "bg-gray-400"}`}>
+                        <div key={clinic.name} className="flex items-center gap-1 space-x-2">
+                            <div className={`justify-start rounded-full h-2.5 w-2.5 ${dotColor}`} />
+                            <Badge variant="secondary" className={`${textColors[clinic.name] || "text-gray-400"} h-4 rounded-full w-fit ${badgeColors[clinic.name] || "bg-gray-400"}`}>
                                 {clinic.shortName.toUpperCase()}
                             </Badge>
                         </div>

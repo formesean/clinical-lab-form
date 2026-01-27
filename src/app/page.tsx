@@ -15,7 +15,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import PatientTable from "../components/ui/PatientTable";
 
 export default function Home() {
   const Date = "Saturday, January 24, 2026"

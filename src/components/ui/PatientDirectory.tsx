@@ -61,7 +61,7 @@ async function getData(): Promise<Patient[]> {
         },
     ]
 }
-export default async function PatientTable() {
+export default async function PatientDirectory() {
     const data = await getData()
 
     return (
