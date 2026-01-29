@@ -1,5 +1,5 @@
-import { columns, Patient, Test } from "../../app/patients/columns"
-import DataTable from "../../app/patients/data-table"
+import { columns, Patient, Test } from "../../app/home/columns"
+import DataTable from "../../app/home/data-table"
 
 async function getData(): Promise<Patient[]> {
     return [
@@ -44,20 +44,6 @@ async function getData(): Promise<Patient[]> {
             name: "Sean Karl Tyrese Aguilar",
             dateReq: "Jan 25, 2026, 11:52 AM",
             status: "Processing",
-            tests: [
-                {
-                    name: "Hematology",
-                    shortName: "HEMA",
-                    subTests: [
-                        { name: "CBC", status: "Pending" },
-                    ]
-                },
-                {
-                    name: "Microbiology",
-                    shortName: "MICRO",
-                    subTests: [{ name: "UA", status: "Processing" }]
-                },
-            ]
         },
     ]
 }
