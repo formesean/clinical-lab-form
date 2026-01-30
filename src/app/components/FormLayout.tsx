@@ -64,6 +64,7 @@ export default function FormLayout({
       <footer className="footer">
         <div>Performed by: ____________</div>
         <div>Verified by: ____________</div>
+        <div>Approved by: ____________</div>
       </footer>
     </div>
   );
