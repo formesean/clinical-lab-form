@@ -7,7 +7,7 @@ import type {
   ListPatientsResponse,
   PatientDTO,
 } from "@/types/api/patients";
-import { FormType, Sex, type PatientSession } from "@prisma/client";
+import { FormType, Sex, Status, type PatientSession } from "@prisma/client";
 import z from "zod";
 
 const CreateBody = z.object({
@@ -18,6 +18,7 @@ const CreateBody = z.object({
   dateOfBirth: z.string().datetime(),
   age: z.number().min(0).max(150),
   sex: z.nativeEnum(Sex),
+  status: z.nativeEnum(Status),
   requestingPhysician: z.string().trim().max(256).nullable().optional(),
   requestedForms: z.array(z.nativeEnum(FormType)).min(1),
 });
@@ -38,6 +39,7 @@ function toPatientDTO(p: PatientSession): PatientDTO {
     dateOfBirth: new Date(p.dateOfBirth).toISOString(),
     age: p.age,
     sex: p.sex,
+    status: p.status,
     requestingPhysician: p.requestingPhysician ?? null,
     requestedForms: p.requestedForms,
     createdAt: p.createdAt.toISOString(),
@@ -92,6 +94,7 @@ export async function POST(req: Request) {
           dateOfBirth: body.dateOfBirth,
           age: body.age,
           sex: body.sex,
+          status: body.status,
           requestingPhysician: body.requestingPhysician ?? null,
           requestedForms: body.requestedForms,
         },

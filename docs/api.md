@@ -324,6 +324,7 @@ Body:
   "dateOfBirth": "1990-01-01T00:00:00.000Z",
   "age": 35,
   "sex": "MALE",
+  "status": "PENDING",
   "requestingPhysician": "Dr. Smith",
   "requestedForms": ["CBC"]
 }
@@ -344,6 +345,7 @@ Response: `201 Created`
     "dateOfBirth": "1990-01-01T00:00:00.000Z",
     "age": 35,
     "sex": "MALE",
+    "status": "PENDING",
     "requestingPhysician": "Dr. Smith",
     "requestedForms": ["CBC"],
     "createdAt": "2026-01-01T00:00:00.000Z",
@@ -401,6 +403,7 @@ Body (all optional):
   "dateOfBirth": "1990-01-01T00:00:00.000Z",
   "age": 35,
   "sex": "MALE",
+  "status": "COMPLETED",
   "requestingPhysician": "Dr. Smith",
   "requestedForms": ["CBC"]
 }
