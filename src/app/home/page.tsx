@@ -20,29 +20,13 @@ import PatientDirectory from "@/components/PatientDirectory";
 import { Badge } from "@/components/ui/badge";
 
 export default function Home() {
-  const Date = "Saturday, January 24, 2026"
-  const Time = "11:10:32 PM"
+
   return (
     <div className="flex flex-col min-h-screen bg-[#E6F3ED] space-y-2">
       <NavBar />
-      <Separator className="bg-[#B7D7C6]" />
-
-      <div className="flex justify-between items-center h-16 px-20 text-black mt-5">
-        <div className="flex flex-col justify-center items-start text-[#135A39]">
-          <h1 className="text-2xl text-[#111827] font-bold">Patient Directory</h1>
-          <p className="text-[#6B7280]">Ongoing laboratory requests</p>
-        </div>
-        <div className="flex items-center justify-center space-x-6 text-[#135A39]">
-          <div className="flex flex-col items-end">
-            <p className="text-[#6B7280]">Philippine Standard Time</p>
-            <p className="font-semibold text-[#111827]">{Date},{Time}</p>
-          </div>
-        </div>
-      </div >
-
       <div className="flex justify-center px-20 space-x-5 mt-4 h-full">
         <div className="flex-1/3 h-full">
-          <Card className="flex bg-white h-140">
+          <Card className="flex bg-white h-full">
             <CardHeader className="">
               <div className="flex justify-between">
                 <a href="#" className="flex items-center space-x-2 text-[#135A39]">
@@ -50,9 +34,9 @@ export default function Home() {
                   <p className="text-[#135A39] font-semibold">Add Patient</p>
                 </a>
                 <InputGroup className="w-80 border-[#135A39]">
-                  <InputGroupInput placeholder="Search..." className="placeholder:text-[#9CA3AF] text-[#111827]" />
+                  <InputGroupInput placeholder="Search..." className="placeholder:text-[#9CA3AF] text-[#111827] selection:bg-[#135A39] selection:text-white" />
                   <InputGroupAddon>
-                    <SearchIcon className="text-[#6B9080]" />
+                    <SearchIcon className="text-[#6B9080] " />
                   </InputGroupAddon>
                 </InputGroup>
               </div>
@@ -89,30 +73,23 @@ export default function Home() {
             </CardHeader>
             <CardContent>
               <div className="flex-1">
-                <Card className="h-98">
-                  <CardContent>
-                    <Tabs>
-                      <TabsList>
-                        <TabsTrigger value="a">Clinical Chemistry</TabsTrigger>
-                        <TabsTrigger value="b">Hematology</TabsTrigger>
-                        <TabsTrigger value="c">Clinical Microscopy</TabsTrigger>
-                        <TabsTrigger value="d">Microbiology</TabsTrigger>
-                        <TabsTrigger value="e">Immuno-serology</TabsTrigger>
-                      </TabsList>
-                      <TabsContent value="a">
-                        <Card className="h-75">
-                          <CardContent>
-                          </CardContent>
-                          <CardFooter>
-                          </CardFooter>
-                        </Card>
-                      </TabsContent>
-                    </Tabs>
-                  </CardContent>
-                  <CardFooter>
-
-                  </CardFooter>
-                </Card>
+                <Tabs>
+                  <TabsList>
+                    <TabsTrigger value="a">Clinical Chemistry</TabsTrigger>
+                    <TabsTrigger value="b">Hematology</TabsTrigger>
+                    <TabsTrigger value="c">Clinical Microscopy</TabsTrigger>
+                    <TabsTrigger value="d">Microbiology</TabsTrigger>
+                    <TabsTrigger value="e">Immuno-serology</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="a">
+                    <Card className="h-75">
+                      <CardContent>
+                      </CardContent>
+                      <CardFooter>
+                      </CardFooter>
+                    </Card>
+                  </TabsContent>
+                </Tabs>
               </div>
             </CardContent>
             <CardFooter>
