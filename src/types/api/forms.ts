@@ -1,4 +1,4 @@
-import type { FormType } from "@prisma/client";
+import type { FormType, Status } from "@prisma/client";
 
 export type LabFormDTO = {
   id: string;
@@ -6,6 +6,7 @@ export type LabFormDTO = {
   formType: FormType;
   data: unknown;
   version: number;
+  status: Status,
   createdAt: string;
   updatedAt: string;
 };

@@ -41,6 +41,11 @@ enum Sex {
   FEMALE
 }
 
+enum Status {
+  PENDING
+  COMPLETED
+}
+
 model Profile {
   id         String        @id
   userIdNum  String        @unique
@@ -70,6 +75,7 @@ model PatientSession {
   sex                 Sex
   requestingPhysician String?
   requestedForms      FormType[]
+  status              Status     @default(PENDING)
   createdAt           DateTime   @default(now())
   updatedAt           DateTime   @updatedAt
 
@@ -90,6 +96,7 @@ model LabForm {
   formType         FormType
   data             Json     @default("{}")
   version          Int      @default(1)
+  status           Status   @default(PENDING)
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
