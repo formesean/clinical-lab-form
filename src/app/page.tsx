@@ -42,7 +42,7 @@ export default function Home() {
         }),
       });
 
-      if (!authLogin) throw new Error("Login failed");
+      if (!authLogin.ok) throw new Error("Login failed");
 
       const data = await authLogin.json();
       console.log("Success:", data);
@@ -67,14 +67,14 @@ export default function Home() {
         <CardContent>
           <form className="space-y-4" onSubmit={handleLogin}>
             <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="email" className="text-[#111827] placeholder:text-[#9CA3AF]">Email</Label>
+              <Label htmlFor="userIdNum" className="text-[#111827] placeholder:text-[#9CA3AF]">DOH ID No.</Label>
               <Input
-                id="email"
-                type="email"
-                placeholder="user@example.com"
+                id="userIdNum"
+                type="text"
+                placeholder="ID-123"
                 className="text-[#111827] placeholder:text-[#9CA3AF] selection:bg-[#135A39] selection:text-white"
                 value={userIdNum}
-                onChange={(e) => { setUserIdNum(e.target.value) }}
+                onChange={(e) => setUserIdNum(e.target.value)}
               />
             </div>
 

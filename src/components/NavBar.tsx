@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "./ui/hover-card";
 import { useRouter } from "next/navigation";
+import { clearAccessToken } from "@/lib/auth-client";
 
 export default function NavBar() {
     const router = useRouter();
@@ -28,6 +29,7 @@ export default function NavBar() {
 
             if (!authLogout.ok) throw new Error("Log out failed");
 
+            clearAccessToken();
             const data = await authLogout.json();
             console.log("Success:", data);
 

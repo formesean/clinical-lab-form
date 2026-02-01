@@ -25,6 +25,7 @@ import { useRouter } from "next/navigation";
 export default function Home() {
   const router = useRouter();
 
+  const [fullName, setFullName] = useState<string>("")
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [userIdNum, setUserIdNum] = useState<string>("");
@@ -73,24 +74,6 @@ export default function Home() {
 
         <CardContent>
           <form className="space-y-4" onSubmit={handleSubmit}>
-            <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="fullName" className="text-[#111827] placeholder:text-[#9CA3AF]">Full Name</Label>
-              <Input
-                id="fullName"
-                type="text"
-                placeholder="Esheloristicism Destravius Maximus Jr."
-                className="text-[#111827] placeholder:text-[#9CA3AF] selection:bg-[#135A39] selection:text-white"
-                value={`${firstName} ${middleName} ${lastName}`.trim()}
-                onChange={(e) => {
-                  const fullName = e.target.value.trim();
-                  const parts = fullName.split(" ");
-                  setFirstName(parts[0] || "");
-                  setMiddleName(parts.length === 3 ? parts[1] : "");
-                  setLastName(parts.length > 1 ? parts[parts.length - 1] : "");
-                }}
-              />
-            </div>
-
             <div className="flex gap-3">
               <div className="flex flex-col space-y-1.5">
                 <Label htmlFor="userIdNum" className="text-[#111827] placeholder:text-[#9CA3AF]">DOH ID No.</Label>
@@ -113,6 +96,43 @@ export default function Home() {
                   className="text-[#111827] placeholder:text-[#9CA3AF] selection:bg-[#135A39] selection:text-white"
                   value={licenseNum}
                   onChange={(e) => setLicenseNum(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <div className="flex flex-col space-y-1.5">
+                <Label htmlFor="lastName" className="text-[#111827] placeholder:text-[#9CA3AF]">Last Name</Label>
+                <Input
+                  id="lastName"
+                  type="text"
+                  placeholder="Uy"
+                  className="text-[#111827] placeholder:text-[#9CA3AF] selection:bg-[#135A39] selection:text-white"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                />
+              </div>
+
+              <div className="flex flex-col space-y-1.5">
+                <Label htmlFor="firstName" className="text-[#111827] placeholder:text-[#9CA3AF]">First Name</Label>
+                <Input
+                  id="firstName"
+                  type="text"
+                  placeholder="Lysander"
+                  className="text-[#111827] placeholder:text-[#9CA3AF] selection:bg-[#135A39] selection:text-white"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                />
+              </div>
+              <div className="flex flex-col space-y-1.5">
+                <Label htmlFor="middleName" className="text-[#111827] placeholder:text-[#9CA3AF] ">Middle Name</Label>
+                <Input
+                  id="middleName"
+                  type="text"
+                  placeholder="Sestoso"
+                  className="text-[#111827] placeholder:text-[#9CA3AF] selection:bg-[#135A39] selection:text-white"
+                  value={middleName}
+                  onChange={(e) => setMiddleName(e.target.value)}
                 />
               </div>
             </div>

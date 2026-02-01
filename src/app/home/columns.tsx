@@ -1,5 +1,3 @@
-"use client"
-
 import { ColumnDef } from "@tanstack/react-table"
 import { Divide, MoreHorizontal, Info } from "lucide-react"
 import {
