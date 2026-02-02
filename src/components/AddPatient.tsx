@@ -34,6 +34,7 @@ export default function AddPatient() {
     const [sex, setSex] = useState<Sex>("MALE")
     const [requestingPhysician, setRequestingPhysician] = useState<string>("")
     const [requestedForms, setRequestedForms] = useState<FormType[]>([])
+    const [open, setOpen] = useState<boolean>(false)
 
     const toggleFormType = (formType: FormType, checked: boolean | "indeterminate") => {
         setRequestedForms((prev) =>
@@ -87,13 +88,15 @@ export default function AddPatient() {
                 throw new Error(data?.error?.message ?? "Failed to add patient");
             }
             console.log("Success:", data);
+
+            setOpen(false);
         } catch (err: unknown) {
             console.error(err instanceof Error ? err.message : err);
         }
     }
 
     return (
-        <Dialog>
+        <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger>
                 <div>
                     <div className="flex items-center space-x-2 text-[#135A39] whitespace-nowrap hover:cursor-pointer">

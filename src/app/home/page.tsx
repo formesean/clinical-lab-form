@@ -62,7 +62,7 @@ export default function Home() {
           </div>
           <div className="flex-2 min-w-0 h-full flex flex-col">
             <Card className="flex bg-white h-full w-full">
-              <PatientInfo></PatientInfo>
+              <PatientInfo selectedPatientId={selectedPatientId} />
             </Card>
           </div>
         </div>
