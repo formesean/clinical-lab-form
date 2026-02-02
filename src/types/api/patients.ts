@@ -1,4 +1,4 @@
-import type { FormType, Sex } from "@prisma/client";
+import type { FormType, Sex, Status } from "@prisma/client";
 
 export type PatientDTO = {
   id: string;
@@ -9,6 +9,7 @@ export type PatientDTO = {
   dateOfBirth: string;
   age: number;
   sex: Sex;
+  status: Status;
   requestingPhysician: string | null;
   requestedForms: FormType[];
   createdAt: string;
@@ -25,6 +26,7 @@ export type CreatePatientRequest = {
   dateOfBirth: string;
   age: number;
   sex: Sex;
+  status: Status;
   requestingPhysician?: string | null;
   requestedForms: FormType[];
 };

@@ -19,6 +19,7 @@ function toFormDTO(f: LabForm): LabFormDTO {
     formType: f.formType,
     data: f.data,
     version: f.version,
+    status: f.status,
     createdAt: f.createdAt.toISOString(),
     updatedAt: f.updatedAt.toISOString(),
   };

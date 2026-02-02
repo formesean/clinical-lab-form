@@ -7,7 +7,7 @@ import type {
   PatchPatientResponse,
   PatientDTO,
 } from "@/types/api/patients";
-import { FormType, Sex, type PatientSession } from "@prisma/client";
+import { FormType, Sex, Status, type PatientSession } from "@prisma/client";
 import z from "zod";
 
 const Params = z.object({ id: z.string().min(1) });
@@ -20,6 +20,7 @@ const PatchBody = z.object({
   dateOfBirth: z.string().datetime().optional(),
   age: z.number().int().min(0).max(150).optional(),
   sex: z.nativeEnum(Sex).optional(),
+  status: z.nativeEnum(Status).optional(),
   requestingPhysician: z.string().trim().max(256).nullable().optional(),
   requestedForms: z.array(z.nativeEnum(FormType)).min(1).optional(),
 });
@@ -34,6 +35,7 @@ function toPatientDTO(p: PatientSession): PatientDTO {
     dateOfBirth: new Date(p.dateOfBirth).toISOString(),
     age: p.age,
     sex: p.sex,
+    status: p.status,
     requestingPhysician: p.requestingPhysician ?? null,
     requestedForms: p.requestedForms,
     createdAt: p.createdAt.toISOString(),
@@ -92,6 +94,7 @@ export async function GET(req: Request, ctx: { params: Promise<unknown> }) {
  * - dateOfBirth?: string (ISO datetime)
  * - age?: number
  * - sex?: Sex
+ * - status?: Status
  * - requestingPhysician?: string | null
  * - requestedForms?: FormType[]
  *
@@ -128,6 +131,7 @@ export async function PATCH(req: Request, ctx: { params: Promise<unknown> }) {
           ...(data.dateOfBirth ? { dateOfBirth: data.dateOfBirth } : {}),
           ...(data.age !== undefined ? { age: data.age } : {}),
           ...(data.sex ? { sex: data.sex } : {}),
+          ...(data.status ? { status: data.status } : {}),
           ...(data.requestingPhysician !== undefined ? { requestingPhysician: data.requestingPhysician } : {}),
           ...(data.requestedForms ? { requestedForms: data.requestedForms } : {}),
         },
