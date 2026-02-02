@@ -1,58 +1,104 @@
-"use client";
+"use client"
 
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
+import NavBar from "@/components/NavBar";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
+import { PlusCircleIcon, SlidersHorizontalIcon, ArrowDownNarrowWide, SearchIcon } from "lucide-react";
+import { Button } from "@/components/ui/button"
 import {
-  ImageTemplateWithFields,
-  type FieldMap,
-} from "@/components/ImageTemplateWithFields";
-import chemFieldmap from "../../public/filemaps/CHEM.fieldmap.json";
-import { useCallback, useEffect, useState } from "react";
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { POST } from "./api/auth/signup/route";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function Home() {
-  const [file, setFile] = useState<File | null>(null);
-  const [objectUrl, setObjectUrl] = useState<string | null>(null);
+  const router = useRouter();
 
-  useEffect(() => {
-    if (!file) {
-      setObjectUrl(null);
-      return;
+  const [userIdNum, setUserIdNum] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    try {
+      const authLogin = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userIdNum,
+          password,
+        }),
+      });
+
+      if (!authLogin.ok) throw new Error("Login failed");
+
+      const data = await authLogin.json();
+      console.log("Success:", data);
+
+      router.push("/home");
+    } catch (err: any) {
+      console.error(err.message);
     }
-    const url = URL.createObjectURL(file);
-    setObjectUrl(url);
-    return () => URL.revokeObjectURL(url);
-  }, [file]);
-
-  const onFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0];
-    setFile(f ?? null);
-  }, []);
+  }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <div className="w-full space-y-4">
-          <label className="block">
-            <span className="mb-2 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-              PDF template
-            </span>
-            <input
-              type="file"
-              accept="application/pdf"
-              onChange={onFileChange}
-              className="block w-full text-sm text-zinc-600 file:mr-4 file:rounded file:border-0 file:bg-zinc-100 file:px-4 file:py-2 file:text-sm file:font-medium file:text-zinc-700 hover:file:bg-zinc-200 dark:text-zinc-400 dark:file:bg-zinc-700 dark:file:text-zinc-200"
-            />
-          </label>
-          {objectUrl ? (
-            <ImageTemplateWithFields
-              map={chemFieldmap as FieldMap}
-              src={objectUrl}
-            />
-          ) : (
-            <p className="rounded border border-dashed border-zinc-300 bg-zinc-50 px-4 py-8 text-center text-sm text-zinc-500 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-400">
-              Choose a PDF file to display the form with field overlays.
-            </p>
-          )}
-        </div>
-      </main>
-    </div>
+    <div className="flex min-h-screen items-center justify-center px-4 bg-[#E6F3ED]">
+      <Card className="w-full max-w-md">
+        <CardHeader>
+          <CardTitle className="text-[#135A39] text-2xl font-bold">Login</CardTitle>
+          <CardDescription className="text-[#135A39]">
+            Sign in to access the laboratory system
+          </CardDescription>
+          <Separator />
+        </CardHeader>
+
+        <CardContent>
+          <form className="space-y-4" onSubmit={handleLogin}>
+            <div className="flex flex-col space-y-1.5">
+              <Label htmlFor="userIdNum" className="text-[#111827] placeholder:text-[#9CA3AF]">DOH ID No.</Label>
+              <Input
+                id="userIdNum"
+                type="text"
+                placeholder="ID-123"
+                className="text-[#111827] placeholder:text-[#9CA3AF] selection:bg-[#135A39] selection:text-white"
+                value={userIdNum}
+                onChange={(e) => setUserIdNum(e.target.value)}
+              />
+            </div>
+
+            <div className="flex flex-col space-y-1.5">
+              <Label htmlFor="password" className="text-[#111827] placeholder:text-[#9CA3AF]">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                className="text-[#111827] placeholder:text-[#9CA3AF] selection:bg-[#135A39] selection:text-white"
+                value={password}
+                onChange={(e) => { setPassword(e.target.value) }}
+              />
+            </div>
+
+            <Button
+              type="submit"
+              className="w-full bg-[#135A39] text-white hover:bg-[#0f4030] mt-2"
+            >
+              Login
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+    </div >
+
   );
 }

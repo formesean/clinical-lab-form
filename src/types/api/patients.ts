@@ -10,10 +10,7 @@ export type PatientDTO = {
   age: number;
   sex: Sex;
   status: Status;
-  requestingPhysician: string | null;
   requestedForms: FormType[];
-  createdAt: string;
-  updatedAt: string;
 };
 
 export type PatientSessionDTO = PatientDTO;
