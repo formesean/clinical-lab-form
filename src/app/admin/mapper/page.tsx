@@ -5,6 +5,8 @@ import NavBar from "@/components/NavBar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 
+type InputType = "number" | "text" | "combobox";
+
 type Rect = {
   id: string;
   page: number;
@@ -14,6 +16,8 @@ type Rect = {
   h: number;
   key?: string;
   label?: string;
+  inputType?: InputType;
+  comboboxItems?: string[];
 };
 
 type ExportMap = {
@@ -42,6 +46,8 @@ type ExportMap = {
     wPct: number;
     hPct: number;
     label?: string;
+    inputType?: InputType;
+    comboboxItems?: string[];
   }>;
 };
 
@@ -51,6 +57,59 @@ function uid() {
 
 function clamp(n: number, min: number, max: number) {
   return Math.max(min, Math.min(max, n));
+}
+
+function ComboboxItemsEditor({
+  items,
+  onChange,
+}: {
+  items: string[];
+  onChange: (items: string[]) => void;
+}) {
+  const [newItem, setNewItem] = useState("");
+  const addItem = () => {
+    const trimmed = newItem.trim();
+    if (!trimmed || items.includes(trimmed)) return;
+    onChange([...items, trimmed]);
+    setNewItem("");
+  };
+  const removeItem = (index: number) => {
+    onChange(items.filter((_, i) => i !== index));
+  };
+  return (
+    <div className="space-y-1">
+      <div className="flex gap-1">
+        <input
+          className="flex-1 min-w-0 rounded border border-[#135A39] px-2 py-1 text-sm text-[#111827]"
+          value={newItem}
+          onChange={(e) => setNewItem(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addItem())}
+          placeholder="New option..."
+        />
+        <button
+          type="button"
+          className="shrink-0 rounded border border-[#135A39] px-2 py-1 text-xs text-[#135A39]"
+          onClick={addItem}
+        >
+          Add
+        </button>
+      </div>
+      <ul className="max-h-32 overflow-auto space-y-0.5">
+        {items.map((item, i) => (
+          <li key={i} className="flex items-center gap-1 text-sm">
+            <span className="flex-1 min-w-0 truncate text-[#111827]">{item}</span>
+            <button
+              type="button"
+              className="shrink-0 rounded border border-red-300 px-1.5 py-0.5 text-xs text-red-600 hover:bg-red-50"
+              onClick={() => removeItem(i)}
+            >
+              Remove
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
 }
 
 // Fixed scale for PDF so fieldmap coordinates match home page
@@ -307,6 +366,8 @@ export default function AdminMapperPage() {
           wPct: Number((wPx / W).toFixed(6)),
           hPct: Number((hPx / H).toFixed(6)),
           label: r.label?.trim() || undefined,
+          inputType: r.inputType,
+          comboboxItems: r.inputType === "combobox" && r.comboboxItems?.length ? r.comboboxItems : undefined,
         };
       })
       .filter((f) => f.key.length > 0);
@@ -382,6 +443,8 @@ export default function AdminMapperPage() {
             h: Math.round((field.hPct ?? field.hPx / (data.meta.pages[0]?.height || 1)) * H),
             key: field.key?.trim(),
             label: field.label?.trim() || undefined,
+            inputType: field.inputType,
+            comboboxItems: field.comboboxItems?.length ? field.comboboxItems : undefined,
           }));
         setRects(rectsFromImport);
         setSelectedId(rectsFromImport[0]?.id ?? null);
@@ -643,6 +706,27 @@ export default function AdminMapperPage() {
                         placeholder="human label"
                       />
                     </label>
+                    <label className="block text-xs text-[#111827]">
+                      Input type
+                      <select
+                        className="mt-1 w-full rounded border border-[#135A39] px-2 py-1 text-sm text-[#111827] bg-white"
+                        value={selected.inputType ?? "text"}
+                        onChange={(e) => updateSelected({ inputType: e.target.value as InputType })}
+                      >
+                        <option value="text">Text</option>
+                        <option value="number">Number (decimal)</option>
+                        <option value="combobox">Combobox</option>
+                      </select>
+                    </label>
+                    {selected.inputType === "combobox" && (
+                      <div className="space-y-1.5">
+                        <div className="text-xs font-medium text-[#111827]">Combobox items</div>
+                        <ComboboxItemsEditor
+                          items={selected.comboboxItems ?? []}
+                          onChange={(items) => updateSelected({ comboboxItems: items })}
+                        />
+                      </div>
+                    )}
                     <div className="grid grid-cols-2 gap-2 text-xs">
                       {(["x", "y", "w", "h"] as const).map((k) => (
                         <label key={k} className="text-[#111827]">
@@ -703,8 +787,9 @@ export default function AdminMapperPage() {
                               </span>
                               <span className="shrink-0 text-[10px] text-muted-foreground">p{r.page}</span>
                             </div>
-                            <div className="mt-0.5 text-[10px] text-muted-foreground">
-                              x{Math.round(r.x)} y{Math.round(r.y)} w{Math.round(r.w)} h{Math.round(r.h)}
+                            <div className="mt-0.5 flex items-center justify-between gap-2 text-[10px] text-muted-foreground">
+                              <span>x{Math.round(r.x)} y{Math.round(r.y)} w{Math.round(r.w)} h{Math.round(r.h)}</span>
+                              <span className="shrink-0 capitalize">{r.inputType ?? "text"}</span>
                             </div>
                           </button>
                         </li>

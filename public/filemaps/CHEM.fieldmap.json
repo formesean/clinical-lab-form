@@ -128,7 +128,8 @@
       "yPct": 0.314141,
       "wPct": 0.091503,
       "hPct": 0.020202,
-      "label": "Age"
+      "label": "Age",
+      "inputType": "number"
     },
     {
       "key": "patient.sex",
@@ -231,7 +232,8 @@
       "xPct": 0.277124,
       "yPct": 0.469697,
       "wPct": 0.091503,
-      "hPct": 0.020202
+      "hPct": 0.020202,
+      "inputType": "number"
     },
     {
       "key": "chem.fbs_CU_flag",
@@ -255,7 +257,8 @@
       "xPct": 0.601307,
       "yPct": 0.469697,
       "wPct": 0.091503,
-      "hPct": 0.020202
+      "hPct": 0.020202,
+      "inputType": "number"
     },
     {
       "key": "chem.fbs_SU_flag",
@@ -279,7 +282,8 @@
       "xPct": 0.277124,
       "yPct": 0.491919,
       "wPct": 0.091503,
-      "hPct": 0.020202
+      "hPct": 0.020202,
+      "inputType": "number"
     },
     {
       "key": "chem.rbs_CU_flag",
@@ -303,7 +307,8 @@
       "xPct": 0.601307,
       "yPct": 0.491919,
       "wPct": 0.091503,
-      "hPct": 0.020202
+      "hPct": 0.020202,
+      "inputType": "number"
     },
     {
       "key": "chem.rbs_SU_flag",
@@ -327,7 +332,8 @@
       "xPct": 0.277124,
       "yPct": 0.520202,
       "wPct": 0.091503,
-      "hPct": 0.020202
+      "hPct": 0.020202,
+      "inputType": "number"
     },
     {
       "key": "chem.tc_CU_flag",
@@ -351,7 +357,8 @@
       "xPct": 0.601307,
       "yPct": 0.520202,
       "wPct": 0.091503,
-      "hPct": 0.020202
+      "hPct": 0.020202,
+      "inputType": "number"
     },
     {
       "key": "chem.tc_SU_flag",
@@ -375,7 +382,8 @@
       "xPct": 0.277124,
       "yPct": 0.543434,
       "wPct": 0.091503,
-      "hPct": 0.030303
+      "hPct": 0.030303,
+      "inputType": "number"
     },
     {
       "key": "chem.hdl_ldl_CU_flag",
@@ -399,7 +407,8 @@
       "xPct": 0.601307,
       "yPct": 0.543434,
       "wPct": 0.091503,
-      "hPct": 0.030303
+      "hPct": 0.030303,
+      "inputType": "number"
     },
     {
       "key": "chem.hdl_ldl_SU_flag",
@@ -423,7 +432,8 @@
       "xPct": 0.277124,
       "yPct": 0.576768,
       "wPct": 0.091503,
-      "hPct": 0.030303
+      "hPct": 0.030303,
+      "inputType": "number"
     },
     {
       "key": "chem.vldl_tri_CU_flag",
@@ -447,7 +457,8 @@
       "xPct": 0.601307,
       "yPct": 0.576768,
       "wPct": 0.091503,
-      "hPct": 0.030303
+      "hPct": 0.030303,
+      "inputType": "number"
     },
     {
       "key": "chem.vldl_tri_SU_flag",
@@ -471,7 +482,8 @@
       "xPct": 0.277124,
       "yPct": 0.609091,
       "wPct": 0.091503,
-      "hPct": 0.015152
+      "hPct": 0.015152,
+      "inputType": "number"
     },
     {
       "key": "chem.crea_CU_flag",
@@ -495,7 +507,8 @@
       "xPct": 0.601307,
       "yPct": 0.609091,
       "wPct": 0.091503,
-      "hPct": 0.015152
+      "hPct": 0.015152,
+      "inputType": "number"
     },
     {
       "key": "chem.crea_SU_flag",
@@ -519,7 +532,8 @@
       "xPct": 0.277124,
       "yPct": 0.627273,
       "wPct": 0.091503,
-      "hPct": 0.030303
+      "hPct": 0.030303,
+      "inputType": "number"
     },
     {
       "key": "chem.bun_bua_CU_flag",
@@ -543,7 +557,8 @@
       "xPct": 0.601307,
       "yPct": 0.627273,
       "wPct": 0.091503,
-      "hPct": 0.030303
+      "hPct": 0.030303,
+      "inputType": "number"
     },
     {
       "key": "chem.bun_bua_SU_flag",
@@ -567,7 +582,8 @@
       "xPct": 0.277124,
       "yPct": 0.660606,
       "wPct": 0.091503,
-      "hPct": 0.030303
+      "hPct": 0.030303,
+      "inputType": "number"
     },
     {
       "key": "chem.sgpt_sgot_CU_flag",
@@ -591,7 +607,8 @@
       "xPct": 0.601307,
       "yPct": 0.660606,
       "wPct": 0.091503,
-      "hPct": 0.030303
+      "hPct": 0.030303,
+      "inputType": "number"
     },
     {
       "key": "chem.tb_CU_val",
@@ -603,7 +620,8 @@
       "xPct": 0.277124,
       "yPct": 0.693939,
       "wPct": 0.091503,
-      "hPct": 0.015152
+      "hPct": 0.015152,
+      "inputType": "number"
     },
     {
       "key": "chem.tb_CU_flag",
@@ -627,7 +645,8 @@
       "xPct": 0.601307,
       "yPct": 0.693939,
       "wPct": 0.091503,
-      "hPct": 0.015152
+      "hPct": 0.015152,
+      "inputType": "number"
     },
     {
       "key": "chem.tb_SU_flag",
@@ -651,7 +670,8 @@
       "xPct": 0.277124,
       "yPct": 0.711111,
       "wPct": 0.091503,
-      "hPct": 0.030303
+      "hPct": 0.030303,
+      "inputType": "number"
     },
     {
       "key": "chem.db_ib_CU_flag",
@@ -675,7 +695,8 @@
       "xPct": 0.601307,
       "yPct": 0.711111,
       "wPct": 0.091503,
-      "hPct": 0.030303
+      "hPct": 0.030303,
+      "inputType": "number"
     },
     {
       "key": "chem.db_ib_SU_flag",
@@ -699,7 +720,8 @@
       "xPct": 0.277124,
       "yPct": 0.745455,
       "wPct": 0.091503,
-      "hPct": 0.030303
+      "hPct": 0.030303,
+      "inputType": "number"
     },
     {
       "key": "chem.ggt_alp_CU_flag",
@@ -723,7 +745,8 @@
       "xPct": 0.601307,
       "yPct": 0.745455,
       "wPct": 0.091503,
-      "hPct": 0.030303
+      "hPct": 0.030303,
+      "inputType": "number"
     },
     {
       "key": "chem.ggt_alp_SU_flag",
@@ -783,7 +806,8 @@
       "xPct": 0.277124,
       "yPct": 0.777778,
       "wPct": 0.091503,
-      "hPct": 0.015152
+      "hPct": 0.015152,
+      "inputType": "number"
     },
     {
       "key": "chem.hba1c_CU_flag",
@@ -807,7 +831,8 @@
       "xPct": 0.601307,
       "yPct": 0.777778,
       "wPct": 0.091503,
-      "hPct": 0.015152
+      "hPct": 0.015152,
+      "inputType": "number"
     },
     {
       "key": "chem.hba1c_SU_flag",

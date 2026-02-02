@@ -45,6 +45,8 @@ type ChemFieldmap = {
     wPx?: number;
     hPx?: number;
     label?: string;
+    inputType?: "number" | "text" | "combobox";
+    comboboxItems?: string[];
   }>;
 };
 
