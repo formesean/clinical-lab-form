@@ -77,7 +77,12 @@ export default function NavBar() {
                                     </div>
                                 </HoverCardContent>
                             </HoverCard>
-                            <DropdownMenuItem className="hover:cursor-pointer">Support</DropdownMenuItem>
+                            <DropdownMenuItem
+                                className="hover:cursor-pointer"
+                                onClick={() => router.push("/admin/mapper")}
+                            >
+                                Mapper
+                            </DropdownMenuItem>
                         </DropdownMenuGroup>
                         <DropdownMenuGroup>
                             <DropdownMenuSeparator />

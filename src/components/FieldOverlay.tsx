@@ -20,38 +20,31 @@ type FieldMap = {
   fields: Array<{
     key: string;
     page: number;
-    // normalized 0..1
     xPct: number;
     yPct: number;
     wPct: number;
     hPct: number;
-    // optional metadata
+    xPx?: number;
+    yPx?: number;
+    wPx?: number;
+    hPx?: number;
     label?: string;
   }>;
 };
 
 type Props = {
   map: FieldMap;
-  page: number; // 1-based
-  pageWidth: number;  // current rendered size
-  pageHeight: number; // current rendered size
+  page: number;
+  pageWidth: number;
+  pageHeight: number;
   values: Record<string, string>;
   onChange: (key: string, value: string) => void;
 };
 
-function rectPctToPx(
-  f: { xPct: number; yPct: number; wPct: number; hPct: number },
-  pageW: number,
-  pageH: number
-) {
-  const left = Math.round(f.xPct * pageW);
-  const top = Math.round(f.yPct * pageH);
-  const width = Math.round(f.wPct * pageW);
-  const height = Math.round(f.hPct * pageH);
-  return { left, top, width, height };
-}
-
-
+/**
+ * Renders input fields over the PDF/image exactly like the mapper renders boxes.
+ * Uses xPx/yPx/wPx/hPx directly when available (same as mapper's r.x, r.y, r.w, r.h).
+ */
 export function FieldOverlay({
   map,
   page,
@@ -66,28 +59,40 @@ export function FieldOverlay({
   );
 
   return (
-    <div className="absolute inset-0">
+    <div
+      className="absolute left-0 top-0 box-border"
+      style={{
+        width: `${pageWidth}px`,
+        height: `${pageHeight}px`,
+      }}
+    >
       {fields.map((f) => {
-        const r = rectPctToPx(f, pageWidth, pageHeight);
+        // Use pixel values directly, exactly like the mapper does:
+        // style={{ left: r.x, top: r.y, width: r.w, height: r.h }}
+        const hasPixelValues =
+          typeof f.xPx === "number" &&
+          typeof f.yPx === "number" &&
+          typeof f.wPx === "number" &&
+          typeof f.hPx === "number";
+
+        const left = hasPixelValues ? f.xPx! : f.xPct * pageWidth;
+        const top = hasPixelValues ? f.yPx! : f.yPct * pageHeight;
+        const width = hasPixelValues ? f.wPx! : f.wPct * pageWidth;
+        const height = hasPixelValues ? f.hPx! : f.hPct * pageHeight;
 
         return (
-          <div
+          <Input
             key={`${f.page}:${f.key}`}
-            className="absolute"
+            className="absolute h-auto text-xs px-1 py-0 bg-[#E6F3ED]/90 border border-[#135A39]/40 text-[#111827] placeholder:text-[#6B9080]"
             style={{
-              left: r.left,
-              top: r.top,
-              width: r.width,
-              height: r.height,
+              left: `${left}px`,
+              top: `${top}px`,
+              width: `${width}px`,
+              height: `${height}px`,
             }}
-          >
-            {/* Use "h-full" to fill mapped height */}
-            <Input
-              className="h-full w-full text-xs px-1 py-0"
-              value={values[f.key] ?? ""}
-              onChange={(e) => onChange(f.key, e.target.value)}
-            />
-          </div>
+            value={values[f.key] ?? ""}
+            onChange={(e) => onChange(f.key, e.target.value)}
+          />
         );
       })}
     </div>
