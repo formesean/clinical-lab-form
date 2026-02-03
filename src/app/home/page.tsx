@@ -1,40 +1,41 @@
 "use client";
 
+import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import NavBar from "@/components/NavBar";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { SearchIcon } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { PlusCircleIcon, SlidersHorizontalIcon, ArrowDownNarrowWide, SearchIcon } from "lucide-react";
+import { Button } from "@/components/ui/button"
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Badge } from "@/components/ui/badge";
+import { string } from "zod";
 import PatientTable from "@/components/PatientTable";
 import AddPatient from "@/components/AddPatient";
-import { FormTemplateViewer } from "@/components/FormTemplateViewer";
-import { useState } from "react";
-
-const FORM_TYPE_BY_TAB: Record<string, string> = {
-  a: "CHEM",
-  b: "OGTT",
-  c: "CBC",
-  d: "BT",
-  e: "UA",
-  f: "SE",
-  g: "PT",
-  h: "OBT",
-  i: "IMMUNO",
-  j: "MICRO"
-};
+import type { PatientDTO } from "@/types/api/patients";
+import PatientInfo from "@/components/PatientInfo";
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState("a");
-  const [fieldValues, setFieldValues] = useState<Record<string, string>>({});
+  const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
+  console.log(selectedPatientId)
 
   return (
     <div className="flex flex-col min-h-screen bg-[#E6F3ED]">
-      <NavBar />
-      <div className="flex flex-1 overflow-hidden">
-        <div className="flex flex-1 items-center px-20 gap-5 p-5 justify-start">
-          <div className="flex-1/3 h-full">
+      <NavBar></NavBar>
+      <div className="flex flex-1 overflow-hidden min-h-0">
+        <div className="flex flex-1 items-center px-20 gap-5 p-5 min-h-0 w-full">
+          <div className="flex-1 min-w-0 h-full flex flex-col">
             <Card className="flex bg-white h-full w-full">
               <CardHeader className="">
                 <div className="flex justify-between gap-10">
@@ -48,124 +49,24 @@ export default function Home() {
                 </div>
                 <Separator className="bg-[#DDEAE3]" />
               </CardHeader>
-              <CardContent>
-                <ScrollArea className="">
+              <CardContent className="flex-1 min-h-0 overflow-hidden flex flex-col px-5">
+                <ScrollArea className="flex-1 min-h-0">
                   <ScrollBar />
-                  <PatientTable></PatientTable>
+                  <PatientTable onRowClick={setSelectedPatientId} />
                 </ScrollArea>
               </CardContent>
               <CardFooter>
+
               </CardFooter>
             </Card>
           </div>
-          <div className="flex-2/3 h-full">
+          <div className="flex-2 min-w-0 h-full flex flex-col">
             <Card className="flex bg-white h-full w-full">
-              <CardHeader className="">
-                <CardTitle>
-                  <span className="font-bold text-xl">Patient Details</span>
-                </CardTitle>
-                <CardDescription>
-                  <div className="flex flex-col space-y-2">
-                    <span>Patient ID:</span>
-                    <div className="flex space-x-6">
-                      <span>Date of Birth: April 12, 2003</span>
-                      <span>Age: 22</span>
-                      <span>Sex: Male</span>
-                    </div>
-                  </div>
-                </CardDescription>
-                <Separator />
-              </CardHeader>
-              <CardContent>
-                <div className="flex-1">
-                  <Tabs value={activeTab} onValueChange={setActiveTab}>
-                    <TabsList>
-                      <TabsTrigger value="a">CHEM</TabsTrigger>
-                      <TabsTrigger value="b">OGTT</TabsTrigger>
-                      <TabsTrigger value="c">CBC</TabsTrigger>
-                      <TabsTrigger value="d">BT</TabsTrigger>
-                      <TabsTrigger value="e">UA</TabsTrigger>
-                      <TabsTrigger value="f">SE</TabsTrigger>
-                    </TabsList>
-                    <TabsContent value="a">
-                      <Card className="p-0">
-                        <CardContent className="p-0 pt-7 flex items-center justify-center w-full">
-                          <FormTemplateViewer
-                            formType={FORM_TYPE_BY_TAB.a}
-                            values={fieldValues}
-                            onChange={(key, value) =>
-                              setFieldValues((prev) => ({ ...prev, [key]: value }))
-                            }
-                          />
-                        </CardContent>
-                        <CardFooter />
-                      </Card>
-                    </TabsContent>
-                    <TabsContent value="b">
-                      <Card className="p-0">
-                        <CardContent className="p-0 pt-7 flex items-center justify-center w-full">
-                          <FormTemplateViewer
-                            formType={FORM_TYPE_BY_TAB.b}
-                            values={fieldValues}
-                            onChange={(key, value) =>
-                              setFieldValues((prev) => ({ ...prev, [key]: value }))
-                            }
-                          />
-                        </CardContent>
-                        <CardFooter />
-                      </Card>
-                    </TabsContent>
-                    <TabsContent value="c">
-                      <Card className="p-0">
-                        <CardContent className="p-0 pt-7 flex items-center justify-center w-full">
-                          <FormTemplateViewer
-                            formType={FORM_TYPE_BY_TAB.c}
-                            values={fieldValues}
-                            onChange={(key, value) =>
-                              setFieldValues((prev) => ({ ...prev, [key]: value }))
-                            }
-                          />
-                        </CardContent>
-                        <CardFooter />
-                      </Card>
-                    </TabsContent>
-                    <TabsContent value="d">
-                      <Card className="p-0">
-                        <CardContent className="p-0 pt-7 flex items-center justify-center w-full">
-                          <FormTemplateViewer
-                            formType={FORM_TYPE_BY_TAB.d}
-                            values={fieldValues}
-                            onChange={(key, value) =>
-                              setFieldValues((prev) => ({ ...prev, [key]: value }))
-                            }
-                          />
-                        </CardContent>
-                        <CardFooter />
-                      </Card>
-                    </TabsContent>
-                    <TabsContent value="e">
-                      <Card className="p-0">
-                        <CardContent className="p-0 pt-7 flex items-center justify-center w-full">
-                          <FormTemplateViewer
-                            formType={FORM_TYPE_BY_TAB.e}
-                            values={fieldValues}
-                            onChange={(key, value) =>
-                              setFieldValues((prev) => ({ ...prev, [key]: value }))
-                            }
-                          />
-                        </CardContent>
-                        <CardFooter />
-                      </Card>
-                    </TabsContent>
-                  </Tabs>
-                </div>
-              </CardContent>
-              <CardFooter>
-              </CardFooter>
+              <PatientInfo selectedPatientId={selectedPatientId} />
             </Card>
           </div>
         </div>
       </div>
-    </div>
+    </div >
   );
 }

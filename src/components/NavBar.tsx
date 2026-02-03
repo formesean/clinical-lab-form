@@ -15,6 +15,7 @@ import {
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "./ui/hover-card";
 import { useRouter } from "next/navigation";
 import { clearAccessToken } from "@/lib/auth-client";
+import { useState, useEffect } from "react";
 
 export default function NavBar() {
     const router = useRouter();
@@ -39,9 +40,30 @@ export default function NavBar() {
         }
     };
 
-    const Date = "Saturday, January 24, 2026"
-    const Time = "11:10:32 PM"
-    const bogo = '<'
+    const [now, setNow] = useState<Date | null>(null);
+
+    useEffect(() => {
+        setNow(new Date());
+        const interval = setInterval(() => setNow(new Date()), 1000);
+        return () => clearInterval(interval);
+    }, []);
+
+    const dateStr = now
+        ? now.toLocaleDateString("en-US", {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+        })
+        : "–";
+    const timeStr = now
+        ? now.toLocaleTimeString("en-US", {
+            hour12: true,
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+        })
+        : "–";
 
     return (
         <div className="sticky flex justify-between place-items-center h-14 bg-[#E6F3ED] px-20 text-black border-b-2 border-[#B7D7C6]">
@@ -55,7 +77,7 @@ export default function NavBar() {
                 <div className="flex items-center justify-center space-x-6 text-[#135A39]">
                     <div className="flex flex-col items-end text-sm">
                         <p className="text-[#6B7280]">Philippine Standard Time</p>
-                        <p className="font-semibold text-[#111827]">{Date},{Time}</p>
+                        <p className="font-semibold text-[#111827]">{dateStr}, {timeStr}</p>
                     </div>
                 </div>
                 <DropdownMenu>

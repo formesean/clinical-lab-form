@@ -91,7 +91,7 @@ export default function Home() {
 
             <Button
               type="submit"
-              className="w-full bg-[#135A39] text-white hover:bg-[#0f4030] mt-2"
+              className="w-full bg-[#135A39] text-white hover:bg-[#0f4030] mt-2 hover:cursor-pointer"
             >
               Login
             </Button>
