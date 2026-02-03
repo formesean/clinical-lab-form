@@ -1,0 +1,272 @@
+{
+  "kind": "pdf",
+  "filename": "BT.pdf",
+  "meta": {
+    "scale": 1.25,
+    "pageCount": 1,
+    "pages": [
+      {
+        "page": 1,
+        "width": 765,
+        "height": 990
+      }
+    ]
+  },
+  "fields": [
+    {
+      "key": "bt.abo_val",
+      "page": 1,
+      "xPx": 431,
+      "yPx": 546,
+      "wPx": 220,
+      "hPx": 55,
+      "xPct": 0.563399,
+      "yPct": 0.551515,
+      "wPct": 0.287582,
+      "hPct": 0.055556,
+      "inputType": "text"
+    },
+    {
+      "key": "bt.rh_val",
+      "page": 1,
+      "xPx": 431,
+      "yPx": 618,
+      "wPx": 220,
+      "hPx": 55,
+      "xPct": 0.563399,
+      "yPct": 0.624242,
+      "wPct": 0.287582,
+      "hPct": 0.055556,
+      "inputType": "text"
+    },
+    {
+      "key": "bt.remarks",
+      "page": 1,
+      "xPx": 115,
+      "yPx": 792,
+      "wPx": 609,
+      "hPx": 17,
+      "xPct": 0.150327,
+      "yPct": 0.8,
+      "wPct": 0.796078,
+      "hPct": 0.017172
+    },
+    {
+      "key": "ogtt.perfByName",
+      "page": 1,
+      "xPx": 58,
+      "yPx": 856,
+      "wPx": 203,
+      "hPx": 20,
+      "xPct": 0.075817,
+      "yPct": 0.864646,
+      "wPct": 0.265359,
+      "hPct": 0.020202
+    },
+    {
+      "key": "bt.perfByLic",
+      "page": 1,
+      "xPx": 157,
+      "yPx": 892,
+      "wPx": 56,
+      "hPx": 17,
+      "xPct": 0.205229,
+      "yPct": 0.90101,
+      "wPct": 0.073203,
+      "hPct": 0.017172
+    },
+    {
+      "key": "patient.patientIdNum",
+      "page": 1,
+      "xPx": 254,
+      "yPx": 245,
+      "wPx": 128,
+      "hPx": 20,
+      "xPct": 0.332026,
+      "yPct": 0.247475,
+      "wPct": 0.16732,
+      "hPct": 0.020202
+    },
+    {
+      "key": "ogtt.dateOfReq",
+      "page": 1,
+      "xPx": 428,
+      "yPx": 245,
+      "wPx": 164,
+      "hPx": 20,
+      "xPct": 0.559477,
+      "yPct": 0.247475,
+      "wPct": 0.214379,
+      "hPct": 0.020202
+    },
+    {
+      "key": "ogtt.timeOfReq",
+      "page": 1,
+      "xPx": 605,
+      "yPx": 245,
+      "wPx": 113,
+      "hPx": 20,
+      "xPct": 0.79085,
+      "yPct": 0.247475,
+      "wPct": 0.147712,
+      "hPct": 0.020202
+    },
+    {
+      "key": "patient.lastName",
+      "page": 1,
+      "xPx": 39,
+      "yPx": 301,
+      "wPx": 178,
+      "hPx": 20,
+      "xPct": 0.05098,
+      "yPct": 0.30404,
+      "wPct": 0.23268,
+      "hPct": 0.020202
+    },
+    {
+      "key": "patient.firstName",
+      "page": 1,
+      "xPx": 293,
+      "yPx": 301,
+      "wPx": 177,
+      "hPx": 20,
+      "xPct": 0.383007,
+      "yPct": 0.30404,
+      "wPct": 0.231373,
+      "hPct": 0.020202
+    },
+    {
+      "key": "patient.middleName",
+      "page": 1,
+      "xPx": 548,
+      "yPx": 301,
+      "wPx": 174,
+      "hPx": 20,
+      "xPct": 0.71634,
+      "yPct": 0.30404,
+      "wPct": 0.227451,
+      "hPct": 0.020202
+    },
+    {
+      "key": "patient.requestingPhysician",
+      "page": 1,
+      "xPx": 485,
+      "yPx": 363,
+      "wPx": 237,
+      "hPx": 20,
+      "xPct": 0.633987,
+      "yPct": 0.366667,
+      "wPct": 0.309804,
+      "hPct": 0.020202
+    },
+    {
+      "key": "patient.sex",
+      "page": 1,
+      "xPx": 376,
+      "yPx": 363,
+      "wPx": 79,
+      "hPx": 20,
+      "xPct": 0.491503,
+      "yPct": 0.366667,
+      "wPct": 0.103268,
+      "hPct": 0.020202
+    },
+    {
+      "key": "patient.age",
+      "page": 1,
+      "xPx": 247,
+      "yPx": 363,
+      "wPx": 79,
+      "hPx": 20,
+      "xPct": 0.322876,
+      "yPct": 0.366667,
+      "wPct": 0.103268,
+      "hPct": 0.020202,
+      "inputType": "text"
+    },
+    {
+      "key": "patient.dateOfBirth",
+      "page": 1,
+      "xPx": 44,
+      "yPx": 363,
+      "wPx": 168,
+      "hPx": 20,
+      "xPct": 0.057516,
+      "yPct": 0.366667,
+      "wPct": 0.219608,
+      "hPct": 0.020202
+    },
+    {
+      "key": "ogtt.datePerf",
+      "page": 1,
+      "xPx": 45,
+      "yPx": 401,
+      "wPx": 172,
+      "hPx": 20,
+      "xPct": 0.058824,
+      "yPct": 0.405051,
+      "wPct": 0.224837,
+      "hPct": 0.020202
+    },
+    {
+      "key": "ogtt.timePerf",
+      "page": 1,
+      "xPx": 227,
+      "yPx": 401,
+      "wPx": 112,
+      "hPx": 20,
+      "xPct": 0.296732,
+      "yPct": 0.405051,
+      "wPct": 0.146405,
+      "hPct": 0.020202
+    },
+    {
+      "key": "ogtt.dateRel",
+      "page": 1,
+      "xPx": 361,
+      "yPx": 401,
+      "wPx": 128,
+      "hPx": 20,
+      "xPct": 0.471895,
+      "yPct": 0.405051,
+      "wPct": 0.16732,
+      "hPct": 0.020202
+    },
+    {
+      "key": "ogtt.timeRel",
+      "page": 1,
+      "xPx": 498,
+      "yPx": 401,
+      "wPx": 97,
+      "hPx": 20,
+      "xPct": 0.65098,
+      "yPct": 0.405051,
+      "wPct": 0.126797,
+      "hPct": 0.020202
+    },
+    {
+      "key": "ogtt.location",
+      "page": 1,
+      "xPx": 613,
+      "yPx": 401,
+      "wPx": 108,
+      "hPx": 20,
+      "xPct": 0.801307,
+      "yPct": 0.405051,
+      "wPct": 0.141176,
+      "hPct": 0.020202
+    },
+    {
+      "key": ".labIdNum",
+      "page": 1,
+      "xPx": 45,
+      "yPx": 245,
+      "wPx": 165,
+      "hPx": 20,
+      "xPct": 0.058824,
+      "yPct": 0.247475,
+      "wPct": 0.215686,
+      "hPct": 0.020202
+    }
+  ]
+}
