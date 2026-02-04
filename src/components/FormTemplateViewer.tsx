@@ -35,13 +35,19 @@ type Props = {
   formType: string;
   values: Record<string, string>;
   onChange: (key: string, value: string) => void;
+  isEditable?: boolean;
 };
 
 /**
  * Loads and renders a form PDF with its fieldmap overlay for a given form type.
  * Fetches /api/templates/{formType}.pdf and /filemaps/{formType}.fieldmap.json.
  */
-export function FormTemplateViewer({ formType, values, onChange }: Props) {
+export function FormTemplateViewer({
+  formType,
+  values,
+  onChange,
+  isEditable = true,
+}: Props) {
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [fieldmap, setFieldmap] = useState<Fieldmap | null>(null);
   const pdfUrlRef = useRef<string | null>(null);
@@ -192,6 +198,7 @@ export function FormTemplateViewer({ formType, values, onChange }: Props) {
                 pageHeight={canvasBufferSize.h}
                 values={values}
                 onChange={onChange}
+                isEditable={isEditable}
               />
             )}
         </div>

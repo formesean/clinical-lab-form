@@ -51,6 +51,7 @@ type Props = {
   pageHeight: number;
   values: Record<string, string>;
   onChange: (key: string, value: string) => void;
+  isEditable?: boolean;
 };
 
 /**
@@ -64,6 +65,7 @@ export function FieldOverlay({
   pageHeight,
   values,
   onChange,
+  isEditable = true,
 }: Props) {
   const fields = useMemo(
     () => map.fields.filter((f) => f.page === page),
@@ -99,10 +101,12 @@ export function FieldOverlay({
           height: `${height}px`,
         };
 
-        const fieldClassName = "absolute h-auto text-xs px-1 py-0 bg-[#E6F3ED]/90 border border-[#135A39]/40 text-[#111827] placeholder:text-[#6B9080]";
+        const fieldClassName = "text-center absolute h-auto text-xs px-1 py-0 bg-[#E6F3ED] border border-[#135A39]/40 text-[#111827] placeholder:text-[#6B9080]";
 
         const inputType = f.inputType ?? "text";
         const currentValue = values[f.key] ?? "";
+
+        const isDisabled = !isEditable;
 
         // Render Combobox for combobox input type
         if (inputType === "combobox" && f.comboboxItems && f.comboboxItems.length > 0) {
@@ -111,11 +115,12 @@ export function FieldOverlay({
               <Combobox
                 value={currentValue}
                 onValueChange={(value) => onChange(f.key, value ?? "")}
+                disabled={isDisabled}
               >
                 <ComboboxValue />
                 <ComboboxInput
                   className="h-full text-xs bg-[#E6F3ED]/90 border border-[#135A39]/40 text-[#111827] placeholder:text-[#6B9080] [&_input]:h-full [&_input]:px-1 [&_input]:py-0 [&_input]:text-xs"
-                  placeholder={f.label}
+                  disabled={isDisabled}
                 />
                 <ComboboxContent>
                   <ComboboxList>
@@ -139,8 +144,8 @@ export function FieldOverlay({
             className={fieldClassName}
             style={fieldStyle}
             value={currentValue}
+            disabled={isDisabled}
             onChange={(e) => onChange(f.key, e.target.value)}
-            placeholder={f.label}
           />
         );
       })}
