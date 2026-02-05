@@ -155,6 +155,7 @@ export default function AdminMapperPage() {
   const [isDrawing, setIsDrawing] = useState(false);
   const drawStart = useRef<{ x: number; y: number } | null>(null);
   const [draft, setDraft] = useState<Rect | null>(null);
+  const [pendingImport, setPendingImport] = useState<ExportMap | null>(null);
 
   const selected = useMemo(
     () => rects.find((r) => r.id === selectedId) ?? null,
@@ -192,7 +193,41 @@ export default function AdminMapperPage() {
     setCanvasBufferSize({ w: 0, h: 0 });
     setImgNatural(null);
     setImgRender(null);
+    setPendingImport(null);
     return () => URL.revokeObjectURL(url);
+  }, [file]);
+
+  useEffect(() => {
+    if (!file) return;
+    let cancelled = false;
+    const baseName = file.name.replace(/\.[^.]+$/, "");
+    const candidates = [
+      baseName,
+      baseName.toUpperCase() !== baseName ? baseName.toUpperCase() : null,
+    ].filter(Boolean) as string[];
+
+    (async () => {
+      for (const name of candidates) {
+        try {
+          const res = await fetch(
+            `/filemaps/${encodeURIComponent(name)}.fieldmap.json`
+          );
+          if (!res.ok) continue;
+          const data = (await res.json()) as ExportMap;
+          if (!cancelled) {
+            setPendingImport(data);
+          }
+          return;
+        } catch {
+          // Ignore and keep trying other candidates
+        }
+      }
+      if (!cancelled) setPendingImport(null);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
   }, [file]);
 
   useEffect(() => {
@@ -463,6 +498,66 @@ export default function AdminMapperPage() {
     importFieldmapInputRef.current?.click();
   }
 
+  function applyFieldmapImport(
+    data: ExportMap,
+    options?: { silent?: boolean }
+  ) {
+    const silent = options?.silent ?? false;
+    if (!kind || overlaySize.w <= 0 || overlaySize.h <= 0) {
+      if (!silent) {
+        alert(
+          "Load a template file (PDF or image) first so field positions can be applied."
+        );
+      }
+      return false;
+    }
+
+    if (
+      !data ||
+      data.kind !== kind ||
+      !Array.isArray(data.fields) ||
+      !data.meta?.pages?.length
+    ) {
+      if (!silent) {
+        alert(
+          "Invalid or incompatible fieldmap. Load the same template type and try again."
+        );
+      }
+      return false;
+    }
+
+    const W = overlaySize.w || 1;
+    const H = overlaySize.h || 1;
+    const basePage = data.meta.pages[0] ?? { width: 1, height: 1 };
+    const rectsFromImport: Rect[] = data.fields
+      .filter((field) => field.page >= 1 && field.key?.trim())
+      .map((field) => ({
+        id: uid(),
+        page: field.page,
+        x: Math.round(
+          (field.xPct ?? field.xPx / (basePage.width || 1)) * W
+        ),
+        y: Math.round(
+          (field.yPct ?? field.yPx / (basePage.height || 1)) * H
+        ),
+        w: Math.round(
+          (field.wPct ?? field.wPx / (basePage.width || 1)) * W
+        ),
+        h: Math.round(
+          (field.hPct ?? field.hPx / (basePage.height || 1)) * H
+        ),
+        key: field.key?.trim(),
+        label: field.label?.trim() || undefined,
+        inputType: field.inputType,
+        comboboxItems: field.comboboxItems?.length
+          ? field.comboboxItems
+          : undefined,
+      }));
+    setRects(rectsFromImport);
+    setSelectedId(rectsFromImport[0]?.id ?? null);
+    return true;
+  }
+
   function onImportFieldmapFile(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0];
     e.target.value = "";
@@ -471,45 +566,7 @@ export default function AdminMapperPage() {
     reader.onload = () => {
       try {
         const data = JSON.parse(reader.result as string) as ExportMap;
-        if (
-          !data ||
-          data.kind !== kind ||
-          !Array.isArray(data.fields) ||
-          !data.meta?.pages?.length
-        ) {
-          alert(
-            "Invalid or incompatible fieldmap. Load the same template type and try again."
-          );
-          return;
-        }
-        const W = overlaySize.w || 1;
-        const H = overlaySize.h || 1;
-        const rectsFromImport: Rect[] = data.fields
-          .filter((field) => field.page >= 1 && field.key?.trim())
-          .map((field) => ({
-            id: uid(),
-            page: field.page,
-            x: Math.round(
-              (field.xPct ?? field.xPx / (data.meta.pages[0]?.width || 1)) * W
-            ),
-            y: Math.round(
-              (field.yPct ?? field.yPx / (data.meta.pages[0]?.height || 1)) * H
-            ),
-            w: Math.round(
-              (field.wPct ?? field.wPx / (data.meta.pages[0]?.width || 1)) * W
-            ),
-            h: Math.round(
-              (field.hPct ?? field.hPx / (data.meta.pages[0]?.height || 1)) * H
-            ),
-            key: field.key?.trim(),
-            label: field.label?.trim() || undefined,
-            inputType: field.inputType,
-            comboboxItems: field.comboboxItems?.length
-              ? field.comboboxItems
-              : undefined,
-          }));
-        setRects(rectsFromImport);
-        setSelectedId(rectsFromImport[0]?.id ?? null);
+        applyFieldmapImport(data);
       } catch {
         alert("Could not parse fieldmap JSON. Check the file format.");
       }
@@ -521,6 +578,13 @@ export default function AdminMapperPage() {
     if (kind === "pdf") return { w: canvasBufferSize.w, h: canvasBufferSize.h };
     return { w: imgRender?.w ?? 0, h: imgRender?.h ?? 0 };
   }, [kind, page, imgRender, canvasBufferSize]);
+
+  useEffect(() => {
+    if (!pendingImport) return;
+    if (!kind || overlaySize.w <= 0 || overlaySize.h <= 0) return;
+    applyFieldmapImport(pendingImport, { silent: true });
+    setPendingImport(null);
+  }, [pendingImport, kind, overlaySize.w, overlaySize.h]);
 
   return (
     <div className="flex flex-col min-h-screen bg-[#E6F3ED]">

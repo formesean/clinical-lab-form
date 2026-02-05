@@ -106,7 +106,13 @@ export function FieldOverlay({
         const inputType = f.inputType ?? "text";
         const currentValue = values[f.key] ?? "";
 
-        const isDisabled = !isEditable;
+        const lowerKey = f.key.toLowerCase();
+        const isFlagField = lowerKey.includes("flag");
+        const isPatientField = lowerKey.includes("patient");
+        const isRequisitionField =
+          lowerKey.includes("dateofreq") || lowerKey.includes("timeofreq");
+        const isDisabled =
+          !isEditable || isFlagField || isPatientField || isRequisitionField;
 
         // Render Combobox for combobox input type
         if (inputType === "combobox" && f.comboboxItems && f.comboboxItems.length > 0) {
@@ -114,12 +120,14 @@ export function FieldOverlay({
             <div key={`${f.page}:${f.key}`} className="absolute" style={fieldStyle}>
               <Combobox
                 value={currentValue}
-                onValueChange={(value) => onChange(f.key, value ?? "")}
+                onValueChange={(value) => {
+                  if (isDisabled) return;
+                  onChange(f.key, value ?? "");
+                }}
                 disabled={isDisabled}
               >
-                <ComboboxValue />
                 <ComboboxInput
-                  className="h-full text-xs bg-[#E6F3ED]/90 border border-[#135A39]/40 text-[#111827] placeholder:text-[#6B9080] [&_input]:h-full [&_input]:px-1 [&_input]:py-0 [&_input]:text-xs"
+                  className="h-full text-xs bg-[#E6F3ED] border border-[#135A39]/40 text-[#111827] placeholder:text-[#6B9080] disabled:cursor-not-allowed disabled:opacity-60 [&_input]:h-full [&_input]:px-1 [&_input]:py-0 [&_input]:text-xs"
                   disabled={isDisabled}
                 />
                 <ComboboxContent>
@@ -141,11 +149,14 @@ export function FieldOverlay({
           <Input
             key={`${f.page}:${f.key}`}
             type={inputType === "number" ? "number" : "text"}
-            className={fieldClassName}
+            className={`${fieldClassName} disabled:cursor-not-allowed disabled:opacity-60`}
             style={fieldStyle}
             value={currentValue}
             disabled={isDisabled}
-            onChange={(e) => onChange(f.key, e.target.value)}
+            onChange={(e) => {
+              if (isDisabled) return;
+              onChange(f.key, e.target.value);
+            }}
           />
         );
       })}

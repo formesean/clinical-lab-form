@@ -144,7 +144,7 @@
       "yPct": 0.279798,
       "wPct": 0.095425,
       "hPct": 0.016162,
-      "inputType": "text"
+      "inputType": "number"
     },
     {
       "key": "patient.dateOfBirth",
@@ -240,7 +240,8 @@
       "xPct": 0.2,
       "yPct": 0.942424,
       "wPct": 0.073203,
-      "hPct": 0.019192
+      "hPct": 0.019192,
+      "inputType": "number"
     }
   ]
 }

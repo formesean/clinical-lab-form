@@ -1,4 +1,5 @@
 import { getAuthedUser, getProfile, handleRouteError, requireApproved } from "@/lib/auth";
+import { buildRequisitionDefaults } from "@/lib/lab-forms";
 import { json, noStore, zodError } from "@/lib/http";
 import { prisma } from "@/lib/prisma";
 import type {
@@ -18,7 +19,7 @@ const CreateBody = z.object({
   dateOfBirth: z.string().datetime(),
   age: z.number().min(0).max(150),
   sex: z.nativeEnum(Sex),
-  status: z.nativeEnum(Status),
+  status: z.nativeEnum(Status).default(Status.PENDING),
   requestingPhysician: z.string().trim().max(256).nullable().optional(),
   requestedForms: z.array(z.nativeEnum(FormType)).min(1),
 });
@@ -100,11 +101,12 @@ export async function POST(req: Request) {
         },
       });
 
+      const requisitionAt = patient.createdAt;
       await tx.labForm.createMany({
         data: body.requestedForms.map((formType) => ({
           patientSessionId: patient.id,
           formType,
-          data: {},
+          data: buildRequisitionDefaults(formType, requisitionAt),
           version: 1,
         })),
         skipDuplicates: true,

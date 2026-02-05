@@ -9,7 +9,9 @@ import {
 } from "./ui/card";
 import { Separator } from "./ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+import type { FormType } from "@prisma/client";
 import { PatientDTO } from "@/types/api/patients";
+import { buildRequisitionDefaults, formatDisplayDate } from "@/lib/lab-forms";
 import { FormTemplateViewer } from "./FormTemplateViewer";
 import { ButtonGroup } from "./ui/button-group";
 import { Button } from "./ui/button";
@@ -91,6 +93,25 @@ export default function PatientInfo({ selectedPatientId }: PatientIdProp) {
     setIsEditing((prev) => !prev);
   };
 
+  const patientFieldValues: Record<string, string> = patientInfo
+    ? {
+        "patient.patientIdNum": patientInfo.patientIdNum ?? "",
+        "patient.lastName": patientInfo.lastName ?? "",
+        "patient.firstName": patientInfo.firstName ?? "",
+        "patient.middleName": patientInfo.middleName ?? "",
+        "patient.dateOfBirth": (() => {
+          if (!patientInfo.dateOfBirth) return "";
+          const parsed = new Date(patientInfo.dateOfBirth);
+          return Number.isNaN(parsed.getTime())
+            ? patientInfo.dateOfBirth
+            : formatDisplayDate(parsed);
+        })(),
+        "patient.age": String(patientInfo.age ?? ""),
+        "patient.sex": patientInfo.sex ?? "",
+        "patient.requestingPhysician": patientInfo.requestingPhysician ?? "",
+      }
+    : {};
+
   return (
     <div>
       {!selectedPatientId ? (
@@ -116,7 +137,7 @@ export default function PatientInfo({ selectedPatientId }: PatientIdProp) {
                 Date Created:{" "}
                 {patientInfo?.createdAt
                   ? new Date(patientInfo.createdAt).toLocaleDateString(
-                      "en-US",
+                      "en-PH",
                       {
                         year: "numeric",
                         month: "long",
@@ -160,8 +181,21 @@ export default function PatientInfo({ selectedPatientId }: PatientIdProp) {
                         <CardContent className="p-0 pt-7 flex items-center justify-center w-full">
                           <FormTemplateViewer
                             formType={formType}
-                            values={formValues[formType] ?? {}}
+                            values={{
+                              ...(patientInfo
+                                ? buildRequisitionDefaults(
+                                    formType as FormType,
+                                    new Date(patientInfo.createdAt),
+                                  )
+                                : {}),
+                              ...(formValues[formType] ?? {}),
+                              ...patientFieldValues,
+                            }}
                             isEditable={isEditing}
+                            patientSex={patientInfo?.sex}
+                            patientDateOfBirth={patientInfo?.dateOfBirth}
+                            patientCreatedAt={patientInfo?.createdAt}
+                            patientAgeYears={patientInfo?.age}
                             onChange={(key, value) =>
                               setFormValues((prev) => ({
                                 ...prev,

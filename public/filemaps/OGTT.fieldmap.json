@@ -59,7 +59,8 @@
       "xPct": 0.188235,
       "yPct": 0.778788,
       "wPct": 0.073203,
-      "hPct": 0.017172
+      "hPct": 0.017172,
+      "inputType": "number"
     },
     {
       "key": "patient.patientIdNum",
@@ -168,7 +169,7 @@
       "yPct": 0.348485,
       "wPct": 0.103268,
       "hPct": 0.020202,
-      "inputType": "text"
+      "inputType": "number"
     },
     {
       "key": "patient.dateOfBirth",
@@ -252,7 +253,8 @@
       "xPct": 0.269281,
       "yPct": 0.546465,
       "wPct": 0.071895,
-      "hPct": 0.017172
+      "hPct": 0.017172,
+      "inputType": "number"
     },
     {
       "key": "ogtt.fh_CU_val",
@@ -264,7 +266,8 @@
       "xPct": 0.269281,
       "yPct": 0.564646,
       "wPct": 0.071895,
-      "hPct": 0.017172
+      "hPct": 0.017172,
+      "inputType": "number"
     },
     {
       "key": "ogtt.sh_CU_val",
@@ -276,7 +279,8 @@
       "xPct": 0.269281,
       "yPct": 0.582828,
       "wPct": 0.071895,
-      "hPct": 0.017172
+      "hPct": 0.017172,
+      "inputType": "number"
     },
     {
       "key": "ogtt.fbs_SI_val",
@@ -288,7 +292,8 @@
       "xPct": 0.620915,
       "yPct": 0.546465,
       "wPct": 0.071895,
-      "hPct": 0.017172
+      "hPct": 0.017172,
+      "inputType": "number"
     },
     {
       "key": "ogtt.fh_SI_val",
@@ -300,7 +305,8 @@
       "xPct": 0.620915,
       "yPct": 0.564646,
       "wPct": 0.071895,
-      "hPct": 0.017172
+      "hPct": 0.017172,
+      "inputType": "number"
     },
     {
       "key": "ogtt.sh_SI_val",
@@ -312,7 +318,8 @@
       "xPct": 0.620915,
       "yPct": 0.582828,
       "wPct": 0.071895,
-      "hPct": 0.017172
+      "hPct": 0.017172,
+      "inputType": "number"
     },
     {
       "key": "ogtt.fbs_SI_flag",
@@ -396,7 +403,8 @@
       "xPct": 0.269281,
       "yPct": 0.60202,
       "wPct": 0.071895,
-      "hPct": 0.017172
+      "hPct": 0.017172,
+      "inputType": "number"
     },
     {
       "key": "ogtt.hba1c_CU_flag",
@@ -420,7 +428,8 @@
       "xPct": 0.620915,
       "yPct": 0.60202,
       "wPct": 0.071895,
-      "hPct": 0.017172
+      "hPct": 0.017172,
+      "inputType": "number"
     },
     {
       "key": "ogtt.hba1c_SI_flag",

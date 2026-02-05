@@ -1,4 +1,5 @@
 import { getAuthedUser, getProfile, handleRouteError, requireApproved } from "@/lib/auth";
+import { buildRequisitionDefaults } from "@/lib/lab-forms";
 import { json, noStore, zodError } from "@/lib/http";
 import { prisma } from "@/lib/prisma";
 import type {
@@ -139,11 +140,12 @@ export async function PATCH(req: Request, ctx: { params: Promise<unknown> }) {
 
       // If requestedForms changed, ensure LabForm rows exist.
       if (data.requestedForms) {
+        const requisitionAt = new Date();
         await tx.labForm.createMany({
           data: data.requestedForms.map((formType) => ({
             patientSessionId: patient.id,
             formType,
-            data: {},
+            data: buildRequisitionDefaults(formType, requisitionAt),
             version: 1,
           })),
           skipDuplicates: true,
