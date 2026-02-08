@@ -1,6 +1,6 @@
 {
   "kind": "pdf",
-  "filename": "CHEM.pdf",
+  "filename": "CHEM_M.pdf",
   "meta": {
     "scale": 1.25,
     "pageCount": 1,
@@ -1085,7 +1085,7 @@
       "hPct": 0.017172
     },
     {
-      "key": "chem.b_SU_val",
+      "key": "chem.ib_SU_val",
       "page": 1,
       "xPx": 460,
       "yPx": 720,
@@ -1098,7 +1098,7 @@
       "inputType": "number"
     },
     {
-      "key": "chem.b_SU_flag",
+      "key": "chem.ib_SU_flag",
       "page": 1,
       "xPx": 583,
       "yPx": 720,

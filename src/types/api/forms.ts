@@ -1,4 +1,7 @@
 import type { FormType, Status } from "@prisma/client";
+import type { ChemFieldKey } from "@/types/fieldmaps";
+
+export type ChemFormDataDTO = Partial<Record<ChemFieldKey, string>>;
 
 export type LabFormDTO = {
   id: string;
