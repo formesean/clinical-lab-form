@@ -61,7 +61,7 @@ export default function Home() {
             </Card>
           </div>
           <div className="flex-2 min-w-0 h-full flex flex-col">
-            <Card className="flex bg-white h-full w-full">
+            <Card className="flex flex-1 bg-white h-full w-full min-h-0 overflow-hidden">
               <PatientInfo selectedPatientId={selectedPatientId} />
             </Card>
           </div>

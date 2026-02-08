@@ -48,7 +48,7 @@ export default function PatientInfo({ selectedPatientId }: PatientIdProp) {
     }, [selectedPatientId]);
 
     return (
-        <div>
+        <div className="min-h-0 overflow-hidden">
             {!selectedPatientId ? (
                 <div className="flex flex-1 items-center justify-center p-8 text-muted-foreground">
                     Select a patient to view details
@@ -75,7 +75,7 @@ export default function PatientInfo({ selectedPatientId }: PatientIdProp) {
                     <CardContent className="flex-1 min-h-0 overflow-hidden flex flex-col">
                         {patientInfo && patientInfo.requestedForms.length > 0 && (
                             <div className="flex-1 mt-3">
-                                <Tabs defaultValue={patientInfo.requestedForms[0]}>
+                                <Tabs defaultValue={patientInfo.requestedForms[0]} className="min-h-0 overflow-hidden">
                                     <TabsList>
                                         {patientInfo.requestedForms.map((formType) => (
                                             <TabsTrigger key={formType} value={formType}>
@@ -85,9 +85,9 @@ export default function PatientInfo({ selectedPatientId }: PatientIdProp) {
                                     </TabsList>
 
                                     {patientInfo.requestedForms.map((formType) => (
-                                        <TabsContent key={formType} value={formType}>
-                                            <Card className="p-0">
-                                                <CardContent className="p-0 pt-7 flex items-center justify-center w-full">
+                                        <TabsContent key={formType} value={formType} className="min-h-0 overflow-hidden">
+                                            <Card className="p-0 min-h-0 overflow-hidden">
+                                                <CardContent className="p-0 pt-7 flex items-center justify-center w-full min-h-0">
                                                     <FormTemplateViewer
                                                         formType={formType}
                                                         values={formValues[formType] ?? {}}

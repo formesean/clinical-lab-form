@@ -21,7 +21,7 @@ export default function PatientTable({ onRowClick }: Props) {
     const [patients, setPatients] = useState<PatientDTO[]>([]);
 
     const q: string | null = null;
-    const limit: number | null = 12;
+    const limit: number | null = null;
     const cursor: string | null = null;
 
     const params = new URLSearchParams();
@@ -71,7 +71,7 @@ export default function PatientTable({ onRowClick }: Props) {
                 <TableHeader>
                     <TableRow>
                         <TableHead className="text-left text-[#111827]">Patient ID</TableHead>
-                        < TableHead className="text-left text-[#111827]"> Name</TableHead >
+                        < TableHead className="text-left text-[#111827]">Name</TableHead >
                         <TableHead className="text-center text-[#111827]">Date Created</TableHead>
                         <TableHead className="text-center text-[#111827]">Status</TableHead>
                     </TableRow>
@@ -102,7 +102,7 @@ export default function PatientTable({ onRowClick }: Props) {
                                 {new Date(patients.createdAt).toLocaleDateString()}
                             </TableCell>
                             <TableCell className="text-center text-[#111827]">
-                                Processing
+                                Pending
                             </TableCell>
                         </TableRow>
                     ))}
