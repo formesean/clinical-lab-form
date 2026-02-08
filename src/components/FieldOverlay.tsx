@@ -52,6 +52,7 @@ type Props = {
   values: Record<string, string>;
   onChange: (key: string, value: string) => void;
   isEditable?: boolean;
+  chemUnitMode?: "CU" | "SI";
 };
 
 /**
@@ -66,6 +67,7 @@ export function FieldOverlay({
   values,
   onChange,
   isEditable = true,
+  chemUnitMode,
 }: Props) {
   const fields = useMemo(
     () => map.fields.filter((f) => f.page === page),
@@ -111,8 +113,18 @@ export function FieldOverlay({
         const isPatientField = lowerKey.includes("patient");
         const isRequisitionField =
           lowerKey.includes("dateofreq") || lowerKey.includes("timeofreq");
+        const isChemField = lowerKey.startsWith("chem.");
+        const isChemCuVal = isChemField && lowerKey.endsWith("_cu_val");
+        const isChemSuVal = isChemField && lowerKey.endsWith("_su_val");
+        const isChemUnitDisabled =
+          !!chemUnitMode &&
+          (chemUnitMode === "CU" ? isChemSuVal : isChemCuVal);
         const isDisabled =
-          !isEditable || isFlagField || isPatientField || isRequisitionField;
+          !isEditable ||
+          isFlagField ||
+          isPatientField ||
+          isRequisitionField ||
+          isChemUnitDisabled;
 
         // Render Combobox for combobox input type
         if (inputType === "combobox" && f.comboboxItems && f.comboboxItems.length > 0) {
@@ -145,10 +157,13 @@ export function FieldOverlay({
         }
 
         // Render Input for text or number input types
+        const isNumericInput = inputType === "number";
         return (
           <Input
             key={`${f.page}:${f.key}`}
-            type={inputType === "number" ? "number" : "text"}
+            type={isNumericInput ? "text" : "text"}
+            inputMode={isNumericInput ? "decimal" : undefined}
+            pattern={isNumericInput ? "[0-9]*[.,]?[0-9]*" : undefined}
             className={`${fieldClassName} disabled:cursor-not-allowed disabled:opacity-60`}
             style={fieldStyle}
             value={currentValue}

@@ -41,6 +41,7 @@ type Props = {
   patientDateOfBirth?: string | null;
   patientCreatedAt?: string | null;
   patientAgeYears?: number | null;
+  chemUnitMode?: "CU" | "SI";
 };
 
 type PatientContext = {
@@ -149,6 +150,7 @@ export function FormTemplateViewer({
   patientDateOfBirth,
   patientCreatedAt,
   patientAgeYears,
+  chemUnitMode,
 }: Props) {
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [fieldmap, setFieldmap] = useState<Fieldmap | null>(null);
@@ -309,6 +311,7 @@ export function FormTemplateViewer({
                 values={values}
                 onChange={onChange}
                 isEditable={isEditable}
+                chemUnitMode={chemUnitMode}
               />
             )}
         </div>

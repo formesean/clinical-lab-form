@@ -201,9 +201,10 @@ export default function AdminMapperPage() {
     if (!file) return;
     let cancelled = false;
     const baseName = file.name.replace(/\.[^.]+$/, "");
+    const firstToken = (baseName.match(/^[A-Za-z0-9]+/)?.[0] ?? baseName).trim();
     const candidates = [
-      baseName,
-      baseName.toUpperCase() !== baseName ? baseName.toUpperCase() : null,
+      firstToken,
+      firstToken.toUpperCase() !== firstToken ? firstToken.toUpperCase() : null,
     ].filter(Boolean) as string[];
 
     (async () => {

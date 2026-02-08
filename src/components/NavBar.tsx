@@ -20,6 +20,15 @@ import type { MeResponse } from "@/types/api/auth";
 export default function NavBar() {
     const router = useRouter();
 
+    const runPreRedirect = async () => {
+        if (typeof window === "undefined") return;
+        await new Promise<void>((resolve) => {
+            const event = new CustomEvent("auth-expired", { detail: { done: resolve } });
+            window.dispatchEvent(event);
+            setTimeout(resolve, 2000);
+        });
+    };
+
     const handleLogout = async () => {
 
         try {
@@ -30,6 +39,7 @@ export default function NavBar() {
 
             if (!authLogout.ok) throw new Error("Log out failed");
 
+            await runPreRedirect();
             clearAccessToken();
             const data = await authLogout.json();
             console.log("Success:", data);
@@ -61,6 +71,12 @@ export default function NavBar() {
                 }
 
                 const res = await fetch("/api/me", { headers });
+                if (res.status === 401) {
+                    await runPreRedirect();
+                    clearAccessToken();
+                    router.push("/");
+                    return;
+                }
                 if (!res.ok) throw new Error("Failed to fetch user profile");
                 const data = (await res.json()) as MeResponse;
                 if (isMounted) setMe(data);
@@ -75,7 +91,34 @@ export default function NavBar() {
         return () => {
             isMounted = false;
         };
-    }, []);
+    }, [router]);
+
+    useEffect(() => {
+        let cancelled = false;
+        const checkAuth = async () => {
+            try {
+                const token = getAccessToken();
+                const headers: HeadersInit = {};
+                if (token) {
+                    headers.Authorization = `Bearer ${token}`;
+                }
+                const res = await fetch("/api/authz/check", { headers });
+                if (res.status === 401) {
+                    await runPreRedirect();
+                    clearAccessToken();
+                    if (!cancelled) router.push("/");
+                }
+            } catch {
+                // ignore transient errors
+            }
+        };
+        checkAuth();
+        const interval = setInterval(checkAuth, 60000);
+        return () => {
+            cancelled = true;
+            clearInterval(interval);
+        };
+    }, [router]);
 
     const dateStr = now
         ? now.toLocaleDateString("en-US", {
