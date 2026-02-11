@@ -24,7 +24,13 @@
       "yPct": 0.551515,
       "wPct": 0.287582,
       "hPct": 0.055556,
-      "inputType": "text"
+      "inputType": "combobox",
+      "comboboxItems": [
+        "A",
+        "B",
+        "AB",
+        "O"
+      ]
     },
     {
       "key": "bt.rh_val",
@@ -37,7 +43,11 @@
       "yPct": 0.624242,
       "wPct": 0.287582,
       "hPct": 0.055556,
-      "inputType": "text"
+      "inputType": "combobox",
+      "comboboxItems": [
+        "POSTIVE",
+        "NEGATIVE"
+      ]
     },
     {
       "key": "bt.remarks",
@@ -52,7 +62,7 @@
       "hPct": 0.017172
     },
     {
-      "key": "ogtt.perfByName",
+      "key": "bt.perfByName",
       "page": 1,
       "xPx": 58,
       "yPx": 856,
@@ -73,7 +83,8 @@
       "xPct": 0.205229,
       "yPct": 0.90101,
       "wPct": 0.073203,
-      "hPct": 0.017172
+      "hPct": 0.017172,
+      "inputType": "number"
     },
     {
       "key": "patient.patientIdNum",
@@ -88,7 +99,7 @@
       "hPct": 0.020202
     },
     {
-      "key": "ogtt.dateOfReq",
+      "key": "bt.dateOfReq",
       "page": 1,
       "xPx": 428,
       "yPx": 245,
@@ -100,7 +111,7 @@
       "hPct": 0.020202
     },
     {
-      "key": "ogtt.timeOfReq",
+      "key": "bt.timeOfReq",
       "page": 1,
       "xPx": 605,
       "yPx": 245,
@@ -182,7 +193,7 @@
       "yPct": 0.366667,
       "wPct": 0.103268,
       "hPct": 0.020202,
-      "inputType": "text"
+      "inputType": "number"
     },
     {
       "key": "patient.dateOfBirth",
@@ -197,7 +208,7 @@
       "hPct": 0.020202
     },
     {
-      "key": "ogtt.datePerf",
+      "key": "bt.datePerf",
       "page": 1,
       "xPx": 45,
       "yPx": 401,
@@ -209,7 +220,7 @@
       "hPct": 0.020202
     },
     {
-      "key": "ogtt.timePerf",
+      "key": "bt.timePerf",
       "page": 1,
       "xPx": 227,
       "yPx": 401,
@@ -221,7 +232,7 @@
       "hPct": 0.020202
     },
     {
-      "key": "ogtt.dateRel",
+      "key": "bt.dateRel",
       "page": 1,
       "xPx": 361,
       "yPx": 401,
@@ -233,7 +244,7 @@
       "hPct": 0.020202
     },
     {
-      "key": "ogtt.timeRel",
+      "key": "bt.timeRel",
       "page": 1,
       "xPx": 498,
       "yPx": 401,
@@ -245,7 +256,7 @@
       "hPct": 0.020202
     },
     {
-      "key": "ogtt.location",
+      "key": "bt.location",
       "page": 1,
       "xPx": 613,
       "yPx": 401,
@@ -257,7 +268,7 @@
       "hPct": 0.020202
     },
     {
-      "key": ".labIdNum",
+      "key": "bt.labIdNum",
       "page": 1,
       "xPx": 45,
       "yPx": 245,

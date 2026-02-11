@@ -1,7 +1,6 @@
 "use client"
 
-import { ChevronLeft, CircleUserRound, LogOutIcon } from "lucide-react";
-import { Button } from "@/components/ui/button"
+import { CircleUserRound, LogOutIcon } from "lucide-react";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -14,11 +13,21 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "./ui/hover-card";
 import { useRouter } from "next/navigation";
-import { clearAccessToken } from "@/lib/auth-client";
+import { clearAccessToken, getAccessToken } from "@/lib/auth-client";
 import { useState, useEffect } from "react";
+import type { MeResponse } from "@/types/api/auth";
 
 export default function NavBar() {
     const router = useRouter();
+
+    const runPreRedirect = async () => {
+        if (typeof window === "undefined") return;
+        await new Promise<void>((resolve) => {
+            const event = new CustomEvent("auth-expired", { detail: { done: resolve } });
+            window.dispatchEvent(event);
+            setTimeout(resolve, 2000);
+        });
+    };
 
     const handleLogout = async () => {
 
@@ -30,6 +39,7 @@ export default function NavBar() {
 
             if (!authLogout.ok) throw new Error("Log out failed");
 
+            await runPreRedirect();
             clearAccessToken();
             const data = await authLogout.json();
             console.log("Success:", data);
@@ -41,12 +51,74 @@ export default function NavBar() {
     };
 
     const [now, setNow] = useState<Date | null>(null);
+    const [me, setMe] = useState<MeResponse | null>(null);
 
     useEffect(() => {
         setNow(new Date());
         const interval = setInterval(() => setNow(new Date()), 1000);
         return () => clearInterval(interval);
     }, []);
+
+    useEffect(() => {
+        let isMounted = true;
+
+        const loadMe = async () => {
+            try {
+                const token = getAccessToken();
+                const headers: HeadersInit = {};
+                if (token) {
+                    headers.Authorization = `Bearer ${token}`;
+                }
+
+                const res = await fetch("/api/me", { headers });
+                if (res.status === 401) {
+                    await runPreRedirect();
+                    clearAccessToken();
+                    router.push("/");
+                    return;
+                }
+                if (!res.ok) throw new Error("Failed to fetch user profile");
+                const data = (await res.json()) as MeResponse;
+                if (isMounted) setMe(data);
+            } catch (err: any) {
+                console.error(err.message ?? "Failed to load profile");
+                if (isMounted) setMe(null);
+            }
+        };
+
+        loadMe();
+
+        return () => {
+            isMounted = false;
+        };
+    }, [router]);
+
+    useEffect(() => {
+        let cancelled = false;
+        const checkAuth = async () => {
+            try {
+                const token = getAccessToken();
+                const headers: HeadersInit = {};
+                if (token) {
+                    headers.Authorization = `Bearer ${token}`;
+                }
+                const res = await fetch("/api/authz/check", { headers });
+                if (res.status === 401) {
+                    await runPreRedirect();
+                    clearAccessToken();
+                    if (!cancelled) router.push("/");
+                }
+            } catch {
+                // ignore transient errors
+            }
+        };
+        checkAuth();
+        const interval = setInterval(checkAuth, 60000);
+        return () => {
+            cancelled = true;
+            clearInterval(interval);
+        };
+    }, [router]);
 
     const dateStr = now
         ? now.toLocaleDateString("en-US", {
@@ -64,6 +136,12 @@ export default function NavBar() {
             second: "2-digit",
         })
         : "–";
+
+    const profile = me?.profile;
+    const displayName = profile
+        ? [profile.firstName, profile.middleName, profile.lastName].filter(Boolean).join(" ")
+        : "Unknown user";
+    const isAdmin = profile?.role === "ADMIN";
 
     return (
         <div className="sticky flex justify-between place-items-center h-14 bg-[#E6F3ED] px-20 text-black border-b-2 border-[#B7D7C6]">
@@ -89,17 +167,22 @@ export default function NavBar() {
                             <DropdownMenuLabel>My Account</DropdownMenuLabel>
                             <HoverCard openDelay={10} closeDelay={100}>
                                 <HoverCardTrigger asChild>
-                                    <DropdownMenuItem>Profile</DropdownMenuItem>
+                                    <DropdownMenuItem className="hover:cursor-pointer">Profile</DropdownMenuItem>
                                 </HoverCardTrigger>
                                 <HoverCardContent side="left" align="start" className="flex w-64 flex-col gap-0.5">
-                                    <div className="font-semibold">@nextjs</div>
-                                    <div>The React Framework – created and maintained by @vercel.</div>
-                                    <div className="text-muted-foreground mt-1 text-xs">
-                                        Joined December 2021
-                                    </div>
+                                    <div className="font-semibold text-[#111827]">{displayName}</div>
+                                    <div className="text-muted-foreground text-xs">{profile?.email ?? me?.user?.email ?? "—"}</div>
+                                    <div className="mt-2 text-xs text-[#111827]">ID No.: {profile?.userIdNum ?? "—"}</div>
+                                    <div className="text-xs text-[#111827]">License No.: {profile?.licenseNum ?? "—"}</div>
+                                    <div className="text-xs text-[#111827]">Role: {profile?.role ?? "—"}</div>
+                                    <div className="text-xs text-[#111827]">Status: {profile?.status ?? "—"}</div>
                                 </HoverCardContent>
                             </HoverCard>
-                            <DropdownMenuItem className="hover:cursor-pointer">Support</DropdownMenuItem>
+                            {isAdmin ? (
+                                <DropdownMenuItem asChild className="hover:cursor-pointer">
+                                    <a href="/admin/mapper">Mapper</a>
+                                </DropdownMenuItem>
+                            ) : null}
                         </DropdownMenuGroup>
                         <DropdownMenuGroup>
                             <DropdownMenuSeparator />

@@ -2,7 +2,13 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import NavBar from "@/components/NavBar";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 
 type InputType = "number" | "text" | "combobox";
@@ -83,7 +89,9 @@ function ComboboxItemsEditor({
           className="flex-1 min-w-0 rounded border border-[#135A39] px-2 py-1 text-sm text-[#111827]"
           value={newItem}
           onChange={(e) => setNewItem(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addItem())}
+          onKeyDown={(e) =>
+            e.key === "Enter" && (e.preventDefault(), addItem())
+          }
           placeholder="New option..."
         />
         <button
@@ -97,7 +105,9 @@ function ComboboxItemsEditor({
       <ul className="max-h-32 overflow-auto space-y-0.5">
         {items.map((item, i) => (
           <li key={i} className="flex items-center gap-1 text-sm">
-            <span className="flex-1 min-w-0 truncate text-[#111827]">{item}</span>
+            <span className="flex-1 min-w-0 truncate text-[#111827]">
+              {item}
+            </span>
             <button
               type="button"
               className="shrink-0 rounded border border-red-300 px-1.5 py-0.5 text-xs text-red-600 hover:bg-red-50"
@@ -124,12 +134,19 @@ export default function AdminMapperPage() {
   const [pdfDoc, setPdfDoc] = useState<any>(null);
   const [pageCount, setPageCount] = useState<number>(0);
   const [page, setPage] = useState<number>(1);
-  const [canvasBufferSize, setCanvasBufferSize] = useState<{ w: number; h: number }>({ w: 0, h: 0 });
+  const [canvasBufferSize, setCanvasBufferSize] = useState<{
+    w: number;
+    h: number;
+  }>({ w: 0, h: 0 });
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   const imgRef = useRef<HTMLImageElement | null>(null);
-  const [imgNatural, setImgNatural] = useState<{ w: number; h: number } | null>(null);
-  const [imgRender, setImgRender] = useState<{ w: number; h: number } | null>(null);
+  const [imgNatural, setImgNatural] = useState<{ w: number; h: number } | null>(
+    null
+  );
+  const [imgRender, setImgRender] = useState<{ w: number; h: number } | null>(
+    null
+  );
 
   const [rects, setRects] = useState<Rect[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -138,10 +155,11 @@ export default function AdminMapperPage() {
   const [isDrawing, setIsDrawing] = useState(false);
   const drawStart = useRef<{ x: number; y: number } | null>(null);
   const [draft, setDraft] = useState<Rect | null>(null);
+  const [pendingImport, setPendingImport] = useState<ExportMap | null>(null);
 
   const selected = useMemo(
     () => rects.find((r) => r.id === selectedId) ?? null,
-    [rects, selectedId],
+    [rects, selectedId]
   );
 
   useEffect(() => {
@@ -151,11 +169,13 @@ export default function AdminMapperPage() {
       const mod = await import("pdfjs-dist/build/pdf");
       mod.GlobalWorkerOptions.workerSrc = new URL(
         "pdfjs-dist/build/pdf.worker.min.mjs",
-        import.meta.url,
+        import.meta.url
       ).toString();
       if (mounted) setPdfjs(mod);
     })().catch(console.error);
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   useEffect(() => {
@@ -173,7 +193,42 @@ export default function AdminMapperPage() {
     setCanvasBufferSize({ w: 0, h: 0 });
     setImgNatural(null);
     setImgRender(null);
+    setPendingImport(null);
     return () => URL.revokeObjectURL(url);
+  }, [file]);
+
+  useEffect(() => {
+    if (!file) return;
+    let cancelled = false;
+    const baseName = file.name.replace(/\.[^.]+$/, "");
+    const firstToken = (baseName.match(/^[A-Za-z0-9]+/)?.[0] ?? baseName).trim();
+    const candidates = [
+      firstToken,
+      firstToken.toUpperCase() !== firstToken ? firstToken.toUpperCase() : null,
+    ].filter(Boolean) as string[];
+
+    (async () => {
+      for (const name of candidates) {
+        try {
+          const res = await fetch(
+            `/filemaps/${encodeURIComponent(name)}.fieldmap.json`
+          );
+          if (!res.ok) continue;
+          const data = (await res.json()) as ExportMap;
+          if (!cancelled) {
+            setPendingImport(data);
+          }
+          return;
+        } catch {
+          // Ignore and keep trying other candidates
+        }
+      }
+      if (!cancelled) setPendingImport(null);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
   }, [file]);
 
   useEffect(() => {
@@ -187,7 +242,9 @@ export default function AdminMapperPage() {
       setPageCount(doc.numPages);
       setPage(1);
     })().catch(console.error);
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [pdfjs, objectUrl, kind]);
 
   useEffect(() => {
@@ -208,7 +265,9 @@ export default function AdminMapperPage() {
       const renderTask = p.render({ canvasContext: ctx, viewport });
       await renderTask.promise;
     })().catch(console.error);
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [pdfDoc, page, kind]);
 
   useEffect(() => {
@@ -250,8 +309,8 @@ export default function AdminMapperPage() {
 
     // For PDF, use canvas buffer size directly (exact pixel coordinates)
     // For images, use rendered size
-    const bufferW = kind === "pdf" ? canvasBufferSize.w : (imgRender?.w ?? 0);
-    const bufferH = kind === "pdf" ? canvasBufferSize.h : (imgRender?.h ?? 0);
+    const bufferW = kind === "pdf" ? canvasBufferSize.w : imgRender?.w ?? 0;
+    const bufferH = kind === "pdf" ? canvasBufferSize.h : imgRender?.h ?? 0;
     if (bufferW <= 0 || bufferH <= 0) return null;
 
     // Get overlay's bounding rect (should match buffer size with explicit px)
@@ -283,7 +342,14 @@ export default function AdminMapperPage() {
     drawStart.current = { x: clamp(pt.x, 0, pt.w), y: clamp(pt.y, 0, pt.h) };
     const p = kind === "pdf" ? page : 1;
     const id = uid();
-    const r: Rect = { id, page: p, x: drawStart.current.x, y: drawStart.current.y, w: 0, h: 0 };
+    const r: Rect = {
+      id,
+      page: p,
+      x: drawStart.current.x,
+      y: drawStart.current.y,
+      w: 0,
+      h: 0,
+    };
     setDraft(r);
     setSelectedId(id);
     (e.currentTarget as HTMLDivElement).setPointerCapture(e.pointerId);
@@ -324,12 +390,15 @@ export default function AdminMapperPage() {
 
   function updateSelected(patch: Partial<Rect>) {
     if (!selectedId) return;
-    setRects((prev) => prev.map((r) => (r.id === selectedId ? { ...r, ...patch } : r)));
+    setRects((prev) =>
+      prev.map((r) => (r.id === selectedId ? { ...r, ...patch } : r))
+    );
   }
 
   function exportJson(): ExportMap | null {
     if (!kind) return null;
-    const pageSizes: Array<{ page: number; width: number; height: number }> = [];
+    const pageSizes: Array<{ page: number; width: number; height: number }> =
+      [];
     if (kind === "pdf") {
       const curW = canvasBufferSize.w || 1;
       const curH = canvasBufferSize.h || 1;
@@ -343,7 +412,9 @@ export default function AdminMapperPage() {
         height: imgRender?.h ?? 0,
       });
     }
-    const sizeByPage = new Map(pageSizes.map((s) => [s.page, { width: s.width, height: s.height }]));
+    const sizeByPage = new Map(
+      pageSizes.map((s) => [s.page, { width: s.width, height: s.height }])
+    );
     const fields = rects
       .filter((r) => !!r.key && r.w > 0 && r.h > 0)
       .map((r) => {
@@ -367,7 +438,10 @@ export default function AdminMapperPage() {
           hPct: Number((hPx / H).toFixed(6)),
           label: r.label?.trim() || undefined,
           inputType: r.inputType,
-          comboboxItems: r.inputType === "combobox" && r.comboboxItems?.length ? r.comboboxItems : undefined,
+          comboboxItems:
+            r.inputType === "combobox" && r.comboboxItems?.length
+              ? r.comboboxItems
+              : undefined,
         };
       })
       .filter((f) => f.key.length > 0);
@@ -401,21 +475,88 @@ export default function AdminMapperPage() {
   function downloadJson() {
     const data = exportJson();
     if (!data) return;
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const blob = new Blob([JSON.stringify(data, null, 2)], {
+      type: "application/json",
+    });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `${(file?.name ?? "template").replace(/\.[^.]+$/, "")}.fieldmap.json`;
+    a.download = `${(file?.name ?? "template").replace(
+      /\.[^.]+$/,
+      ""
+    )}.fieldmap.json`;
     a.click();
     URL.revokeObjectURL(url);
   }
 
   function importFieldmap() {
     if (!kind || overlaySize.w <= 0 || overlaySize.h <= 0) {
-      alert("Load a template file (PDF or image) first so field positions can be applied.");
+      alert(
+        "Load a template file (PDF or image) first so field positions can be applied."
+      );
       return;
     }
     importFieldmapInputRef.current?.click();
+  }
+
+  function applyFieldmapImport(
+    data: ExportMap,
+    options?: { silent?: boolean }
+  ) {
+    const silent = options?.silent ?? false;
+    if (!kind || overlaySize.w <= 0 || overlaySize.h <= 0) {
+      if (!silent) {
+        alert(
+          "Load a template file (PDF or image) first so field positions can be applied."
+        );
+      }
+      return false;
+    }
+
+    if (
+      !data ||
+      data.kind !== kind ||
+      !Array.isArray(data.fields) ||
+      !data.meta?.pages?.length
+    ) {
+      if (!silent) {
+        alert(
+          "Invalid or incompatible fieldmap. Load the same template type and try again."
+        );
+      }
+      return false;
+    }
+
+    const W = overlaySize.w || 1;
+    const H = overlaySize.h || 1;
+    const basePage = data.meta.pages[0] ?? { width: 1, height: 1 };
+    const rectsFromImport: Rect[] = data.fields
+      .filter((field) => field.page >= 1 && field.key?.trim())
+      .map((field) => ({
+        id: uid(),
+        page: field.page,
+        x: Math.round(
+          (field.xPct ?? field.xPx / (basePage.width || 1)) * W
+        ),
+        y: Math.round(
+          (field.yPct ?? field.yPx / (basePage.height || 1)) * H
+        ),
+        w: Math.round(
+          (field.wPct ?? field.wPx / (basePage.width || 1)) * W
+        ),
+        h: Math.round(
+          (field.hPct ?? field.hPx / (basePage.height || 1)) * H
+        ),
+        key: field.key?.trim(),
+        label: field.label?.trim() || undefined,
+        inputType: field.inputType,
+        comboboxItems: field.comboboxItems?.length
+          ? field.comboboxItems
+          : undefined,
+      }));
+    setRects(rectsFromImport);
+    setSelectedId(rectsFromImport[0]?.id ?? null);
+    return true;
   }
 
   function onImportFieldmapFile(e: React.ChangeEvent<HTMLInputElement>) {
@@ -426,28 +567,7 @@ export default function AdminMapperPage() {
     reader.onload = () => {
       try {
         const data = JSON.parse(reader.result as string) as ExportMap;
-        if (!data || data.kind !== kind || !Array.isArray(data.fields) || !data.meta?.pages?.length) {
-          alert("Invalid or incompatible fieldmap. Load the same template type and try again.");
-          return;
-        }
-        const W = overlaySize.w || 1;
-        const H = overlaySize.h || 1;
-        const rectsFromImport: Rect[] = data.fields
-          .filter((field) => field.page >= 1 && field.key?.trim())
-          .map((field) => ({
-            id: uid(),
-            page: field.page,
-            x: Math.round((field.xPct ?? field.xPx / (data.meta.pages[0]?.width || 1)) * W),
-            y: Math.round((field.yPct ?? field.yPx / (data.meta.pages[0]?.height || 1)) * H),
-            w: Math.round((field.wPct ?? field.wPx / (data.meta.pages[0]?.width || 1)) * W),
-            h: Math.round((field.hPct ?? field.hPx / (data.meta.pages[0]?.height || 1)) * H),
-            key: field.key?.trim(),
-            label: field.label?.trim() || undefined,
-            inputType: field.inputType,
-            comboboxItems: field.comboboxItems?.length ? field.comboboxItems : undefined,
-          }));
-        setRects(rectsFromImport);
-        setSelectedId(rectsFromImport[0]?.id ?? null);
+        applyFieldmapImport(data);
       } catch {
         alert("Could not parse fieldmap JSON. Check the file format.");
       }
@@ -459,6 +579,13 @@ export default function AdminMapperPage() {
     if (kind === "pdf") return { w: canvasBufferSize.w, h: canvasBufferSize.h };
     return { w: imgRender?.w ?? 0, h: imgRender?.h ?? 0 };
   }, [kind, page, imgRender, canvasBufferSize]);
+
+  useEffect(() => {
+    if (!pendingImport) return;
+    if (!kind || overlaySize.w <= 0 || overlaySize.h <= 0) return;
+    applyFieldmapImport(pendingImport, { silent: true });
+    setPendingImport(null);
+  }, [pendingImport, kind, overlaySize.w, overlaySize.h]);
 
   return (
     <div className="flex flex-col min-h-screen bg-[#E6F3ED]">
@@ -475,7 +602,7 @@ export default function AdminMapperPage() {
                   <label className="text-sm font-medium text-[#111827]">
                     Template file (PDF / PNG / JPG)
                     <input
-                      className="ml-2 text-sm border border-[#135A39] rounded px-2 py-1 text-[#111827]"
+                      className="ml-2 text-sm border border-[#135A39] rounded px-2 py-1 text-[#111827] hover:cursor-pointer"
                       type="file"
                       accept="application/pdf,image/png,image/jpeg"
                       onChange={(e) => setFile(e.target.files?.[0] ?? null)}
@@ -491,16 +618,22 @@ export default function AdminMapperPage() {
                       >
                         Prev
                       </button>
-                      <span className="text-[#111827]">Page {page} / {pageCount || 1}</span>
+                      <span className="text-[#111827]">
+                        Page {page} / {pageCount || 1}
+                      </span>
                       <button
                         type="button"
                         className="rounded border border-[#135A39] px-2 py-1 text-[#135A39] disabled:opacity-50"
                         disabled={page >= (pageCount || 1)}
-                        onClick={() => setPage((p) => Math.min(pageCount || 1, p + 1))}
+                        onClick={() =>
+                          setPage((p) => Math.min(pageCount || 1, p + 1))
+                        }
                       >
                         Next
                       </button>
-                      <span className="text-muted-foreground">Scale {PDF_SCALE} (fixed)</span>
+                      <span className="text-muted-foreground">
+                        Scale {PDF_SCALE} (fixed)
+                      </span>
                     </div>
                   )}
                 </CardDescription>
@@ -508,7 +641,9 @@ export default function AdminMapperPage() {
               </CardHeader>
               <CardContent className="p-3 overflow-auto flex flex-col items-center justify-center min-h-[50vh]">
                 {!kind && (
-                  <div className="text-muted-foreground">Select a template file to start mapping.</div>
+                  <div className="text-muted-foreground">
+                    Select a template file to start mapping.
+                  </div>
                 )}
                 {kind === "pdf" && pdfDoc && (
                   <div className="flex items-center justify-center w-full">
@@ -541,42 +676,41 @@ export default function AdminMapperPage() {
                             onPointerMove={onPointerMove}
                             onPointerUp={onPointerUp}
                           >
-                          {currentPageRects().map((r) => (
-                            <button
-                              key={r.id}
-                              type="button"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                setSelectedId(r.id);
-                              }}
-                              className={`absolute ${
-                                r.id === selectedId
-                                  ? "border-[3px] border-[#0d3d2a] bg-[#135A39]/30 shadow-md"
-                                  : "border-2 border-[#6B9080] bg-[#6B9080]/10"
-                              }`}
-                              style={{
-                                left: `${r.x}px`,
-                                top: `${r.y}px`,
-                                width: `${r.w}px`,
-                                height: `${r.h}px`,
-                              }}
-                              title={r.key ? r.key : "unassigned"}
-                            />
-                          ))}
-                          {draft && (
-                            <div
-                              className="absolute border-2 border-orange-600 bg-orange-500/10"
-                              style={{
-                                left: `${draft.x}px`,
-                                top: `${draft.y}px`,
-                                width: `${draft.w}px`,
-                                height: `${draft.h}px`,
-                              }}
-                            />
-                          )}
-                        </div>
-                      )}
+                            {currentPageRects().map((r) => (
+                              <button
+                                key={r.id}
+                                type="button"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  setSelectedId(r.id);
+                                }}
+                                className={`absolute ${r.id === selectedId
+                                    ? "border-[3px] border-[#0d3d2a] bg-[#135A39]/30 shadow-md"
+                                    : "border-2 border-[#6B9080] bg-[#6B9080]/10"
+                                  }`}
+                                style={{
+                                  left: `${r.x}px`,
+                                  top: `${r.y}px`,
+                                  width: `${r.w}px`,
+                                  height: `${r.h}px`,
+                                }}
+                                title={r.key ? r.key : "unassigned"}
+                              />
+                            ))}
+                            {draft && (
+                              <div
+                                className="absolute border-2 border-orange-600 bg-orange-500/10"
+                                style={{
+                                  left: `${draft.x}px`,
+                                  top: `${draft.y}px`,
+                                  width: `${draft.w}px`,
+                                  height: `${draft.h}px`,
+                                }}
+                              />
+                            )}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -592,7 +726,10 @@ export default function AdminMapperPage() {
                         onLoad={() => {
                           const img = imgRef.current;
                           if (!img) return;
-                          setImgNatural({ w: img.naturalWidth, h: img.naturalHeight });
+                          setImgNatural({
+                            w: img.naturalWidth,
+                            h: img.naturalHeight,
+                          });
                           const rect = img.getBoundingClientRect();
                           setImgRender({ w: rect.width, h: rect.height });
                         }}
@@ -618,12 +755,16 @@ export default function AdminMapperPage() {
                                 e.stopPropagation();
                                 setSelectedId(r.id);
                               }}
-                              className={`absolute ${
-                                r.id === selectedId
+                              className={`absolute ${r.id === selectedId
                                   ? "border-[3px] border-[#0d3d2a] bg-[#135A39]/30 shadow-md"
                                   : "border-2 border-[#6B9080] bg-[#6B9080]/10"
-                              }`}
-                              style={{ left: r.x, top: r.y, width: r.w, height: r.h }}
+                                }`}
+                              style={{
+                                left: r.x,
+                                top: r.y,
+                                width: r.w,
+                                height: r.h,
+                              }}
                               title={r.key ?? "unassigned"}
                             />
                           ))}
@@ -649,7 +790,9 @@ export default function AdminMapperPage() {
           <div className="flex-1/3 h-full">
             <Card className="flex bg-white h-full w-full">
               <CardHeader>
-                <CardTitle className="font-bold text-xl text-[#135A39]">Field Map</CardTitle>
+                <CardTitle className="font-bold text-xl text-[#135A39]">
+                  Field Map
+                </CardTitle>
                 <CardDescription>
                   Draw boxes on the template. Select a box to assign a key.
                 </CardDescription>
@@ -664,7 +807,7 @@ export default function AdminMapperPage() {
                   />
                   <button
                     type="button"
-                    className="rounded border border-[#135A39] px-2 py-1 text-sm text-[#135A39] disabled:opacity-50"
+                    className="rounded border border-[#135A39] px-2 py-1 text-sm text-[#135A39] disabled:opacity-50 enabled:hover:cursor-pointer"
                     disabled={!kind || overlaySize.w <= 0 || overlaySize.h <= 0}
                     onClick={importFieldmap}
                   >
@@ -672,7 +815,7 @@ export default function AdminMapperPage() {
                   </button>
                   <button
                     type="button"
-                    className="rounded border border-[#135A39] px-2 py-1 text-sm text-[#135A39] disabled:opacity-50"
+                    className="rounded border border-[#135A39] px-2 py-1 text-sm text-[#135A39] disabled:opacity-50 enabled:hover:cursor-pointer"
                     disabled={rects.length === 0}
                     onClick={downloadJson}
                   >
@@ -682,80 +825,104 @@ export default function AdminMapperPage() {
               </CardHeader>
               <CardContent className="p-3 overflow-auto">
                 <div className="rounded border border-[#DDEAE3] p-2 mb-3">
-                  <div className="text-xs font-medium text-[#111827]">Selected</div>
+                  <div className="text-xs font-medium text-[#111827]">
+                    Selected
+                  </div>
                   {!selected && (
-                    <div className="mt-2 text-sm text-muted-foreground">None</div>
+                    <div className="mt-2 text-sm text-muted-foreground">
+                      None
+                    </div>
                   )}
                   {selected && (
                     <div className="mt-2 space-y-2">
-                    <label className="block text-xs text-[#111827]">
-                      Key (required)
-                      <input
-                        className="mt-1 w-full rounded border border-[#135A39] px-2 py-1 text-sm text-[#111827]"
-                        value={selected.key ?? ""}
-                        onChange={(e) => updateSelected({ key: e.target.value })}
-                        placeholder="e.g. patient.lastName"
-                      />
-                    </label>
-                    <label className="block text-xs text-[#111827]">
-                      Label (optional)
-                      <input
-                        className="mt-1 w-full rounded border border-[#135A39] px-2 py-1 text-sm text-[#111827]"
-                        value={selected.label ?? ""}
-                        onChange={(e) => updateSelected({ label: e.target.value })}
-                        placeholder="human label"
-                      />
-                    </label>
-                    <label className="block text-xs text-[#111827]">
-                      Input type
-                      <select
-                        className="mt-1 w-full rounded border border-[#135A39] px-2 py-1 text-sm text-[#111827] bg-white"
-                        value={selected.inputType ?? "text"}
-                        onChange={(e) => updateSelected({ inputType: e.target.value as InputType })}
-                      >
-                        <option value="text">Text</option>
-                        <option value="number">Number (decimal)</option>
-                        <option value="combobox">Combobox</option>
-                      </select>
-                    </label>
-                    {selected.inputType === "combobox" && (
-                      <div className="space-y-1.5">
-                        <div className="text-xs font-medium text-[#111827]">Combobox items</div>
-                        <ComboboxItemsEditor
-                          items={selected.comboboxItems ?? []}
-                          onChange={(items) => updateSelected({ comboboxItems: items })}
+                      <label className="block text-xs text-[#111827]">
+                        Key (required)
+                        <input
+                          className="mt-1 w-full rounded border border-[#135A39] px-2 py-1 text-sm text-[#111827]"
+                          value={selected.key ?? ""}
+                          onChange={(e) =>
+                            updateSelected({ key: e.target.value })
+                          }
+                          placeholder="e.g. patient.lastName"
                         />
-                      </div>
-                    )}
-                    <div className="grid grid-cols-2 gap-2 text-xs">
-                      {(["x", "y", "w", "h"] as const).map((k) => (
-                        <label key={k} className="text-[#111827]">
-                          {k.toUpperCase()}
-                          <input
-                            className="mt-1 w-full rounded border border-[#135A39] px-2 py-1 text-sm"
-                            type="number"
-                            value={Math.round(selected[k])}
-                            onChange={(e) => updateSelected({ [k]: Number(e.target.value) || 0 })}
+                      </label>
+                      <label className="block text-xs text-[#111827]">
+                        Label (optional)
+                        <input
+                          className="mt-1 w-full rounded border border-[#135A39] px-2 py-1 text-sm text-[#111827]"
+                          value={selected.label ?? ""}
+                          onChange={(e) =>
+                            updateSelected({ label: e.target.value })
+                          }
+                          placeholder="human label"
+                        />
+                      </label>
+                      <label className="block text-xs text-[#111827]">
+                        Input type
+                        <select
+                          className="mt-1 w-full rounded border border-[#135A39] px-2 py-1 text-sm text-[#111827] bg-white"
+                          value={selected.inputType ?? "text"}
+                          onChange={(e) =>
+                            updateSelected({
+                              inputType: e.target.value as InputType,
+                            })
+                          }
+                        >
+                          <option value="text">Text</option>
+                          <option value="number">Number (decimal)</option>
+                          <option value="combobox">Combobox</option>
+                        </select>
+                      </label>
+                      {selected.inputType === "combobox" && (
+                        <div className="space-y-1.5">
+                          <div className="text-xs font-medium text-[#111827]">
+                            Combobox items
+                          </div>
+                          <ComboboxItemsEditor
+                            items={selected.comboboxItems ?? []}
+                            onChange={(items) =>
+                              updateSelected({ comboboxItems: items })
+                            }
                           />
-                        </label>
-                      ))}
+                        </div>
+                      )}
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        {(["x", "y", "w", "h"] as const).map((k) => (
+                          <label key={k} className="text-[#111827]">
+                            {k.toUpperCase()}
+                            <input
+                              className="mt-1 w-full rounded border border-[#135A39] px-2 py-1 text-sm"
+                              type="number"
+                              value={Math.round(selected[k])}
+                              onChange={(e) =>
+                                updateSelected({
+                                  [k]: Number(e.target.value) || 0,
+                                })
+                              }
+                            />
+                          </label>
+                        ))}
+                      </div>
+                      <div className="flex items-center justify-between pt-1">
+                        <span className="text-xs text-muted-foreground">
+                          Page: {selected.page}
+                        </span>
+                        <button
+                          type="button"
+                          className="rounded border border-[#135A39] px-2 py-1 text-sm text-[#135A39]"
+                          onClick={removeSelected}
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </div>
-                    <div className="flex items-center justify-between pt-1">
-                      <span className="text-xs text-muted-foreground">Page: {selected.page}</span>
-                      <button
-                        type="button"
-                        className="rounded border border-[#135A39] px-2 py-1 text-sm text-[#135A39]"
-                        onClick={removeSelected}
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </div>
                   )}
                 </div>
                 <div className="rounded border border-[#DDEAE3] p-2">
                   <div className="mb-2 flex items-center justify-between">
-                    <span className="text-xs font-medium text-[#111827]">Fields ({rects.length})</span>
+                    <span className="text-xs font-medium text-[#111827]">
+                      Fields ({rects.length})
+                    </span>
                     <button
                       type="button"
                       className="rounded border border-[#135A39] px-2 py-1 text-xs text-[#135A39] disabled:opacity-50"
@@ -771,25 +938,33 @@ export default function AdminMapperPage() {
                   <ul className="max-h-[380px] overflow-auto space-y-1">
                     {rects
                       .slice()
-                      .sort((a, b) => (a.page - b.page) || (a.y - b.y) || (a.x - b.x))
+                      .sort((a, b) => a.page - b.page || a.y - b.y || a.x - b.x)
                       .map((r) => (
                         <li key={r.id}>
                           <button
                             type="button"
-                            className={`w-full rounded px-2 py-1 text-left text-xs ${
-                              r.id === selectedId ? "bg-[#DDEAE3] text-[#135A39]" : "hover:bg-[#E6F3ED]"
-                            }`}
+                            className={`w-full rounded px-2 py-1 text-left text-xs ${r.id === selectedId
+                                ? "bg-[#DDEAE3] text-[#135A39]"
+                                : "hover:bg-[#E6F3ED]"
+                              }`}
                             onClick={() => setSelectedId(r.id)}
                           >
                             <div className="flex justify-between gap-2">
                               <span className="truncate font-medium">
                                 {r.key?.trim() ? r.key : "(unassigned)"}
                               </span>
-                              <span className="shrink-0 text-[10px] text-muted-foreground">p{r.page}</span>
+                              <span className="shrink-0 text-[10px] text-muted-foreground">
+                                p{r.page}
+                              </span>
                             </div>
                             <div className="mt-0.5 flex items-center justify-between gap-2 text-[10px] text-muted-foreground">
-                              <span>x{Math.round(r.x)} y{Math.round(r.y)} w{Math.round(r.w)} h{Math.round(r.h)}</span>
-                              <span className="shrink-0 capitalize">{r.inputType ?? "text"}</span>
+                              <span>
+                                x{Math.round(r.x)} y{Math.round(r.y)} w
+                                {Math.round(r.w)} h{Math.round(r.h)}
+                              </span>
+                              <span className="shrink-0 capitalize">
+                                {r.inputType ?? "text"}
+                              </span>
                             </div>
                           </button>
                         </li>
@@ -797,7 +972,8 @@ export default function AdminMapperPage() {
                   </ul>
                 </div>
                 <p className="mt-3 text-xs text-muted-foreground">
-                  PDF scale is fixed at {PDF_SCALE} so exported fieldmaps match the home page.
+                  PDF scale is fixed at {PDF_SCALE} so exported fieldmaps match
+                  the home page.
                 </p>
               </CardContent>
             </Card>

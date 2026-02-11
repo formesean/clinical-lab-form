@@ -23,7 +23,8 @@
       "xPct": 0.30719,
       "yPct": 0.450505,
       "wPct": 0.117647,
-      "hPct": 0.017172
+      "hPct": 0.017172,
+      "inputType": "number"
     },
     {
       "key": "cbc.rbc_val",
@@ -35,7 +36,8 @@
       "xPct": 0.30719,
       "yPct": 0.467677,
       "wPct": 0.117647,
-      "hPct": 0.017172
+      "hPct": 0.017172,
+      "inputType": "number"
     },
     {
       "key": "cbc.hemoglo_val",
@@ -47,7 +49,8 @@
       "xPct": 0.30719,
       "yPct": 0.484848,
       "wPct": 0.117647,
-      "hPct": 0.017172
+      "hPct": 0.017172,
+      "inputType": "number"
     },
     {
       "key": "cbc.hemato_val",
@@ -59,7 +62,8 @@
       "xPct": 0.30719,
       "yPct": 0.5,
       "wPct": 0.117647,
-      "hPct": 0.017172
+      "hPct": 0.017172,
+      "inputType": "number"
     },
     {
       "key": "cbc.mcv_val",
@@ -71,7 +75,8 @@
       "xPct": 0.30719,
       "yPct": 0.517172,
       "wPct": 0.117647,
-      "hPct": 0.017172
+      "hPct": 0.017172,
+      "inputType": "number"
     },
     {
       "key": "cbc.mch_val",
@@ -83,7 +88,8 @@
       "xPct": 0.30719,
       "yPct": 0.533333,
       "wPct": 0.117647,
-      "hPct": 0.017172
+      "hPct": 0.017172,
+      "inputType": "number"
     },
     {
       "key": "cbc.mchc_val",
@@ -95,7 +101,8 @@
       "xPct": 0.30719,
       "yPct": 0.550505,
       "wPct": 0.117647,
-      "hPct": 0.017172
+      "hPct": 0.017172,
+      "inputType": "number"
     },
     {
       "key": "cbc.rdw_val",
@@ -107,7 +114,8 @@
       "xPct": 0.30719,
       "yPct": 0.567677,
       "wPct": 0.117647,
-      "hPct": 0.017172
+      "hPct": 0.017172,
+      "inputType": "number"
     },
     {
       "key": "cbc.labIdNum",
@@ -228,7 +236,7 @@
       "yPct": 0.320202,
       "wPct": 0.103268,
       "hPct": 0.020202,
-      "inputType": "text"
+      "inputType": "number"
     },
     {
       "key": "patient.dateOfBirth",
@@ -312,7 +320,8 @@
       "xPct": 0.30719,
       "yPct": 0.607071,
       "wPct": 0.117647,
-      "hPct": 0.017172
+      "hPct": 0.017172,
+      "inputType": "number"
     },
     {
       "key": "cbc.mpv_val",
@@ -324,7 +333,8 @@
       "xPct": 0.30719,
       "yPct": 0.624242,
       "wPct": 0.117647,
-      "hPct": 0.017172
+      "hPct": 0.017172,
+      "inputType": "number"
     },
     {
       "key": "cbc.neutro_r_val",
@@ -336,7 +346,8 @@
       "xPct": 0.329412,
       "yPct": 0.69697,
       "wPct": 0.071895,
-      "hPct": 0.017172
+      "hPct": 0.017172,
+      "inputType": "number"
     },
     {
       "key": "cbc.lympho_r_val",
@@ -348,7 +359,8 @@
       "xPct": 0.329412,
       "yPct": 0.714141,
       "wPct": 0.071895,
-      "hPct": 0.017172
+      "hPct": 0.017172,
+      "inputType": "number"
     },
     {
       "key": "cbc.mono_r_val",
@@ -360,7 +372,8 @@
       "xPct": 0.329412,
       "yPct": 0.731313,
       "wPct": 0.071895,
-      "hPct": 0.017172
+      "hPct": 0.017172,
+      "inputType": "number"
     },
     {
       "key": "cbc.eosi_r_val",
@@ -372,7 +385,8 @@
       "xPct": 0.329412,
       "yPct": 0.747475,
       "wPct": 0.071895,
-      "hPct": 0.017172
+      "hPct": 0.017172,
+      "inputType": "number"
     },
     {
       "key": "cbc.baso_r_val",
@@ -384,7 +398,8 @@
       "xPct": 0.329412,
       "yPct": 0.764646,
       "wPct": 0.071895,
-      "hPct": 0.017172
+      "hPct": 0.017172,
+      "inputType": "number"
     },
     {
       "key": "cbc.ig_r_val",
@@ -396,7 +411,8 @@
       "xPct": 0.329412,
       "yPct": 0.781818,
       "wPct": 0.071895,
-      "hPct": 0.017172
+      "hPct": 0.017172,
+      "inputType": "number"
     },
     {
       "key": "cbc.remarks",
@@ -432,7 +448,8 @@
       "xPct": 0.227451,
       "yPct": 0.90202,
       "wPct": 0.062745,
-      "hPct": 0.017172
+      "hPct": 0.017172,
+      "inputType": "number"
     },
     {
       "key": "cbc.wbc_flag",
@@ -636,7 +653,8 @@
       "xPct": 0.628758,
       "yPct": 0.69697,
       "wPct": 0.071895,
-      "hPct": 0.017172
+      "hPct": 0.017172,
+      "inputType": "number"
     },
     {
       "key": "cbc.lympho_a_val",
@@ -648,7 +666,8 @@
       "xPct": 0.628758,
       "yPct": 0.714141,
       "wPct": 0.071895,
-      "hPct": 0.017172
+      "hPct": 0.017172,
+      "inputType": "number"
     },
     {
       "key": "cbc.mono_a_val",
@@ -660,7 +679,8 @@
       "xPct": 0.628758,
       "yPct": 0.731313,
       "wPct": 0.071895,
-      "hPct": 0.017172
+      "hPct": 0.017172,
+      "inputType": "number"
     },
     {
       "key": "cbc.eosi_a_val",
@@ -672,7 +692,8 @@
       "xPct": 0.628758,
       "yPct": 0.747475,
       "wPct": 0.071895,
-      "hPct": 0.017172
+      "hPct": 0.017172,
+      "inputType": "number"
     },
     {
       "key": "cbc.baso_a_val",
@@ -684,7 +705,8 @@
       "xPct": 0.628758,
       "yPct": 0.764646,
       "wPct": 0.071895,
-      "hPct": 0.017172
+      "hPct": 0.017172,
+      "inputType": "number"
     },
     {
       "key": "cbc.ig_a_val",
@@ -696,7 +718,8 @@
       "xPct": 0.628758,
       "yPct": 0.781818,
       "wPct": 0.071895,
-      "hPct": 0.017172
+      "hPct": 0.017172,
+      "inputType": "number"
     },
     {
       "key": "cbc.neutro_a_flag",

@@ -1,6 +1,7 @@
 "use client";
 
 import { FieldOverlay } from "@/components/FieldOverlay";
+import type { Sex } from "@prisma/client";
 import { useEffect, useRef, useState } from "react";
 
 // Fixed scale - MUST match the mapper's PDF_SCALE exactly
@@ -35,13 +36,122 @@ type Props = {
   formType: string;
   values: Record<string, string>;
   onChange: (key: string, value: string) => void;
+  isEditable?: boolean;
+  patientSex?: Sex | null;
+  patientDateOfBirth?: string | null;
+  patientCreatedAt?: string | null;
+  patientAgeYears?: number | null;
+  chemUnitMode?: "CU" | "SI";
+};
+
+type PatientContext = {
+  sex?: Sex | null;
+  dateOfBirth?: string | null;
+  createdAt?: string | null;
+  ageYears?: number | null;
+};
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+const parseDate = (value?: string | null) => {
+  if (!value) return null;
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+};
+
+const getAgeParts = (dob: Date, asOf: Date) => {
+  const days = Math.floor((asOf.getTime() - dob.getTime()) / DAY_MS);
+  let months = (asOf.getFullYear() - dob.getFullYear()) * 12 + (asOf.getMonth() - dob.getMonth());
+  if (asOf.getDate() < dob.getDate()) months -= 1;
+  let years = asOf.getFullYear() - dob.getFullYear();
+  const beforeBirthday =
+    asOf.getMonth() < dob.getMonth() ||
+    (asOf.getMonth() === dob.getMonth() && asOf.getDate() < dob.getDate());
+  if (beforeBirthday) years -= 1;
+  return { days, months, years };
+};
+
+const resolveCbcTemplate = (ctx: PatientContext) => {
+  const dob = parseDate(ctx.dateOfBirth);
+  const asOf = parseDate(ctx.createdAt) ?? new Date();
+  if (dob) {
+    const { days, months, years } = getAgeParts(dob, asOf);
+    if (years >= 18) {
+      if (ctx.sex === "MALE") return "CBC_M_18y-equal_above";
+      if (ctx.sex === "FEMALE") return "CBC_F_18y-equal_above";
+      return "CBC";
+    }
+    if (days <= 7) return "CBC_MF_1w-equal_less";
+    if (months < 1) return "CBC_MF_1w-1m";
+    if (months < 2) return "CBC_MF_1m-2m";
+    if (months < 6) return "CBC_MF_2m-6m";
+    if (months < 12) return "CBC_MF_6m-1y";
+    if (years < 2) return "CBC_MF_2y-5y";
+    if (years <= 5) return "CBC_MF_2y-5y";
+    if (years <= 11) return "CBC_MF_6y-11y";
+    if (years <= 17) return "CBC_MF_12y-17y";
+    return "CBC";
+  }
+
+  const ageYears = ctx.ageYears ?? null;
+  if (ageYears === null || Number.isNaN(ageYears)) return "CBC";
+  if (ageYears >= 18) {
+    if (ctx.sex === "MALE") return "CBC_M_18y-equal_above";
+    if (ctx.sex === "FEMALE") return "CBC_F_18y-equal_above";
+    return "CBC";
+  }
+  if (ageYears >= 12) return "CBC_MF_12y-17y";
+  if (ageYears >= 6) return "CBC_MF_6y-11y";
+  if (ageYears >= 2) return "CBC_MF_2y-5y";
+  if (ageYears >= 1) return "CBC_MF_6m-1y";
+  return "CBC_MF_1w-1m";
+};
+
+const resolveTemplateName = (formType: string, ctx: PatientContext) => {
+  const base = formType.trim().toUpperCase();
+  switch (base) {
+    case "CHEM":
+      if (ctx.sex === "MALE") return "CHEM_M";
+      if (ctx.sex === "FEMALE") return "CHEM_F";
+      return "CHEM";
+    case "CBC":
+      return resolveCbcTemplate(ctx);
+    case "OGTT":
+      return "OGTT";
+    case "BT":
+      return "BT_MF";
+    case "IMMUNO":
+      return "IMMUNO_MF";
+    case "MICRO":
+      return "MICRO_MF";
+    case "OBT":
+      return "OBT_MF";
+    case "SE":
+      return "SE_MF";
+    case "UA":
+      return "UA_MF";
+    case "PT":
+      return "PT";
+    default:
+      return base;
+  }
 };
 
 /**
  * Loads and renders a form PDF with its fieldmap overlay for a given form type.
  * Fetches /api/templates/{formType}.pdf and /filemaps/{formType}.fieldmap.json.
  */
-export function FormTemplateViewer({ formType, values, onChange }: Props) {
+export function FormTemplateViewer({
+  formType,
+  values,
+  onChange,
+  isEditable = true,
+  patientSex,
+  patientDateOfBirth,
+  patientCreatedAt,
+  patientAgeYears,
+  chemUnitMode,
+}: Props) {
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [fieldmap, setFieldmap] = useState<Fieldmap | null>(null);
   const pdfUrlRef = useRef<string | null>(null);
@@ -68,6 +178,13 @@ export function FormTemplateViewer({ formType, values, onChange }: Props) {
     return () => { mounted = false; };
   }, []);
 
+  const templateName = resolveTemplateName(formType, {
+    sex: patientSex,
+    dateOfBirth: patientDateOfBirth,
+    createdAt: patientCreatedAt,
+    ageYears: patientAgeYears,
+  });
+
   // Load PDF and fieldmap for this form type
   useEffect(() => {
     if (!formType?.trim()) {
@@ -80,10 +197,11 @@ export function FormTemplateViewer({ formType, values, onChange }: Props) {
       return;
     }
     const type = formType.trim().toUpperCase();
+    const templateKey = templateName.trim().toUpperCase();
     let cancelled = false;
     (async () => {
       const [pdfRes, fieldmapRes] = await Promise.all([
-        fetch(`/api/templates/${type}.pdf`),
+        fetch(`/api/templates/${templateKey}.pdf`),
         fetch(`/filemaps/${type}.fieldmap.json`),
       ]);
       if (cancelled) return;
@@ -106,7 +224,7 @@ export function FormTemplateViewer({ formType, values, onChange }: Props) {
         pdfUrlRef.current = null;
       }
     };
-  }, [formType]);
+  }, [formType, templateName]);
 
   // Load PDF document from blob URL
   useEffect(() => {
@@ -192,6 +310,8 @@ export function FormTemplateViewer({ formType, values, onChange }: Props) {
                 pageHeight={canvasBufferSize.h}
                 values={values}
                 onChange={onChange}
+                isEditable={isEditable}
+                chemUnitMode={chemUnitMode}
               />
             )}
         </div>

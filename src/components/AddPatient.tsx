@@ -15,7 +15,7 @@ import { CircleUserRound, LogOutIcon, PlusCircleIcon } from "lucide-react"
 import { Separator } from "./ui/separator"
 import { Label } from "./ui/label"
 import { Input } from "./ui/input"
-import { DatePicker } from "./DatePicker"
+// import { DatePicker } from "./DatePicker"
 import { FormType, Sex } from "@prisma/client"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuTrigger } from "./ui/dropdown-menu"
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "./ui/hover-card"
@@ -50,14 +50,39 @@ export default function AddPatient() {
         { label: "Female", value: "FEMALE" },
     ]
 
+    const normalizeDateOfBirth = (value: string) => {
+        const trimmed = value.trim()
+        if (!trimmed) return ""
+
+        const isoDateMatch = /^\d{4}-\d{2}-\d{2}$/.exec(trimmed)
+        if (isoDateMatch) {
+            return new Date(`${trimmed}T00:00:00`).toISOString()
+        }
+
+        const dmyMatch = /^(\d{1,2})\/([A-Za-z]{3})\/(\d{4})$/.exec(trimmed)
+        if (dmyMatch) {
+            const day = Number(dmyMatch[1])
+            const monthToken = dmyMatch[2].toLowerCase()
+            const year = Number(dmyMatch[3])
+            const months: Record<string, number> = {
+                jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6,
+                jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12,
+            }
+            const month = months[monthToken]
+            if (!month) return trimmed
+            const dd = String(day).padStart(2, "0")
+            const mm = String(month).padStart(2, "0")
+            return new Date(`${year}-${mm}-${dd}T00:00:00`).toISOString()
+        }
+
+        return trimmed
+    }
+
     const handleAddPatient = async (e: React.FormEvent) => {
         e.preventDefault();
 
         try {
-            const dateOfBirthIso =
-                dateOfBirth.length === 10
-                    ? new Date(dateOfBirth + "T00:00:00").toISOString()
-                    : dateOfBirth;
+            const dateOfBirthIso = normalizeDateOfBirth(dateOfBirth)
             const body = {
                 patientIdNum,
                 lastName,
@@ -168,7 +193,7 @@ export default function AddPatient() {
                             <Input
                                 id="dateOfBirth"
                                 type="text"
-                                placeholder="2003-04-12"
+                                placeholder="dd/mmm/yyyy"
                                 className="text-[#111827] placeholder:text-[#9CA3AF] selection:bg-[#135A39] selection:text-white"
                                 value={dateOfBirth}
                                 onChange={(e) => setDateOfBirth(e.target.value)}
