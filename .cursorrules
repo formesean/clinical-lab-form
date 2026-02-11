@@ -1,0 +1,9 @@
+# Cursor rules for clinical-lab-form
+
+- Stack: Next.js 16 App Router, React 19, TypeScript, Tailwind CSS v4, Prisma (PostgreSQL), Supabase auth.
+- Use `pnpm` for scripts (`pnpm dev`, `pnpm lint`, `pnpm format`).
+- Use `@/` import alias for `src/` paths; keep components in `src/components` and app routes in `src/app`.
+- API routes live in `src/app/api/**/route.ts`; keep responses consistent with `docs/api.md` error shape.
+- Database access goes through `src/lib/prisma.ts`; Supabase client via `src/lib/supabase.ts`.
+- Avoid editing binary form templates in `src/templates` unless explicitly requested.
+- Keep TypeScript strict and avoid `any`; add shared types in `src/types` when needed.
