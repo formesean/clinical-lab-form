@@ -9,7 +9,7 @@ export type LabFormDTO = {
   formType: FormType;
   data: unknown;
   version: number;
-  status: Status,
+  status: Status;
   createdAt: string;
   updatedAt: string;
 };
@@ -53,12 +53,10 @@ export type AcquireLockResponse = {
   ok: boolean;
   message: string;
   lockToken: string;
-  expiresAt: string;
 };
 
 export type RenewLockResponse = {
   ok: boolean;
   message: string;
   lockToken: string;
-  expiresAt: string;
 };

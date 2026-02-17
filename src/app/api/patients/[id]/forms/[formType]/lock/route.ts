@@ -1,10 +1,15 @@
-import { getAuthedUser, getProfile, handleRouteError, requireApproved } from "@/lib/auth";
-import { errorJson, json, noStore, zodError } from "@/lib/http";
-import { prisma } from "@/lib/prisma";
+import crypto from "node:crypto";
 import { FormType } from "@prisma/client";
 import z from "zod";
+import {
+  getAuthedUser,
+  getProfile,
+  handleRouteError,
+  requireApproved,
+} from "@/lib/auth";
+import { errorJson, json, noStore, zodError } from "@/lib/http";
+import { prisma } from "@/lib/prisma";
 import type { AcquireLockResponse } from "@/types/api/forms";
-import crypto from "node:crypto";
 
 const Params = z.object({
   id: z.string().min(1),
@@ -14,11 +19,6 @@ const Params = z.object({
 const Body = z.object({
   lockToken: z.string().min(10).optional(),
 });
-
-function ttlSeconds() {
-  const v = Number(process.env.LOCK_TTL_SECONDS ?? "180");
-  return Number.isFinite(v) && v >= 60 && v <= 600 ? v : 180;
-}
 
 /**
  * POST /api/patients/:id/forms/:formType/lock
@@ -33,7 +33,7 @@ function ttlSeconds() {
  * - lockToken: string (optional) - reuse existing token when refreshing
  *
  * Returns (JSON):
- * - { ok: true, message: string, lockToken: string, expiresAt: string }
+ * - { ok: true, message: string, lockToken: string }
  *
  * Status codes:
  * - 200 OK
@@ -58,18 +58,20 @@ export async function POST(req: Request, ctx: { params: Promise<unknown> }) {
       where: { id: p.data.id },
       select: { id: true },
     });
-    if (!patient) return errorJson(404, "NOT_FOUND", "Patient session not found");
+    if (!patient)
+      return errorJson(404, "NOT_FOUND", "Patient session not found");
 
-    const now = new Date();
-    const expiresAt = new Date(now.getTime() + ttlSeconds() * 1000);
     const newToken = parsed.data.lockToken ?? crypto.randomUUID();
 
     const result = await prisma.$transaction(async (tx) => {
       const existing = await tx.formEditLock.findUnique({
         where: {
-          patientSessionId_formType: { patientSessionId: patient.id, formType: p.data.formType },
+          patientSessionId_formType: {
+            patientSessionId: patient.id,
+            formType: p.data.formType,
+          },
         },
-        select: { lockedByUserId: true, expiresAt: true },
+        select: { lockedByUserId: true },
       });
 
       if (!existing) {
@@ -79,21 +81,22 @@ export async function POST(req: Request, ctx: { params: Promise<unknown> }) {
             formType: p.data.formType,
             lockedByUserId: me.id,
             lockToken: newToken,
-            expiresAt,
           },
-          select: { lockToken: true, expiresAt: true },
+          select: { lockToken: true },
         });
         return { ok: true as const, ...created };
       }
 
-      // If expired or held by same user, take/refresh it
-      if (existing.expiresAt <= now || existing.lockedByUserId === me.id) {
+      if (existing.lockedByUserId === me.id) {
         const updated = await tx.formEditLock.update({
           where: {
-            patientSessionId_formType: { patientSessionId: patient.id, formType: p.data.formType },
+            patientSessionId_formType: {
+              patientSessionId: patient.id,
+              formType: p.data.formType,
+            },
           },
-          data: { lockedByUserId: me.id, lockToken: newToken, expiresAt },
-          select: { lockToken: true, expiresAt: true },
+          data: { lockedByUserId: me.id, lockToken: newToken },
+          select: { lockToken: true },
         });
         return { ok: true as const, ...updated };
       }
@@ -111,7 +114,6 @@ export async function POST(req: Request, ctx: { params: Promise<unknown> }) {
       ok: true,
       message: "Lock acquired successfully",
       lockToken: result.lockToken,
-      expiresAt: result.expiresAt.toISOString(),
     };
 
     return noStore(json(response, { status: 200 }));
@@ -152,20 +154,31 @@ export async function DELETE(req: Request, ctx: { params: Promise<unknown> }) {
       .safeParse(await req.json().catch(() => null));
     if (!body.success) return zodError(body.error);
 
-    const now = new Date();
-
     const lock = await prisma.formEditLock.findUnique({
-      where: { patientSessionId_formType: { patientSessionId: p.data.id, formType: p.data.formType } },
-      select: { lockedByUserId: true, lockToken: true, expiresAt: true },
+      where: {
+        patientSessionId_formType: {
+          patientSessionId: p.data.id,
+          formType: p.data.formType,
+        },
+      },
+      select: { lockedByUserId: true, lockToken: true },
     });
 
     const valid =
-      !!lock && lock.lockedByUserId === me.id && lock.lockToken === body.data.lockToken && lock.expiresAt > now;
+      !!lock &&
+      lock.lockedByUserId === me.id &&
+      lock.lockToken === body.data.lockToken;
 
-    if (!valid) return errorJson(409, "LOCK_INVALID", "Lock not held by caller");
+    if (!valid)
+      return errorJson(409, "LOCK_INVALID", "Lock not held by caller");
 
     await prisma.formEditLock.delete({
-      where: { patientSessionId_formType: { patientSessionId: p.data.id, formType: p.data.formType } },
+      where: {
+        patientSessionId_formType: {
+          patientSessionId: p.data.id,
+          formType: p.data.formType,
+        },
+      },
     });
 
     return new Response(null, { status: 204 });

@@ -1,8 +1,13 @@
-import { getAuthedUser, getProfile, handleRouteError, requireApproved } from "@/lib/auth";
-import { errorJson, json, noStore, zodError } from "@/lib/http";
-import { prisma } from "@/lib/prisma";
 import { FormType } from "@prisma/client";
 import z from "zod";
+import {
+  getAuthedUser,
+  getProfile,
+  handleRouteError,
+  requireApproved,
+} from "@/lib/auth";
+import { errorJson, json, noStore, zodError } from "@/lib/http";
+import { prisma } from "@/lib/prisma";
 import type { RenewLockResponse } from "@/types/api/forms";
 
 const Params = z.object({
@@ -13,11 +18,6 @@ const Params = z.object({
 const Body = z.object({
   lockToken: z.string().min(10),
 });
-
-function ttlSeconds() {
-  const v = Number(process.env.LOCK_TTL_SECONDS ?? "180");
-  return Number.isFinite(v) && v >= 60 && v <= 600 ? v : 180;
-}
 
 /**
  * POST /api/patients/:id/forms/:formType/lock/renew
@@ -32,7 +32,7 @@ function ttlSeconds() {
  * - lockToken: string (required)
  *
  * Returns (JSON):
- * - { ok: true, message: string, lockToken: string, expiresAt: string }
+ * - { ok: true, message: string, lockToken: string }
  *
  * Status codes:
  * - 200 OK
@@ -52,30 +52,28 @@ export async function POST(req: Request, ctx: { params: Promise<unknown> }) {
     const body = Body.safeParse(await req.json().catch(() => null));
     if (!body.success) return zodError(body.error);
 
-    const now = new Date();
-    const expiresAt = new Date(now.getTime() + ttlSeconds() * 1000);
-
     const lock = await prisma.formEditLock.findUnique({
-      where: { patientSessionId_formType: { patientSessionId: p.data.id, formType: p.data.formType } },
-      select: { lockedByUserId: true, lockToken: true, expiresAt: true },
+      where: {
+        patientSessionId_formType: {
+          patientSessionId: p.data.id,
+          formType: p.data.formType,
+        },
+      },
+      select: { lockedByUserId: true, lockToken: true },
     });
 
     const valid =
-      !!lock && lock.lockedByUserId === me.id && lock.lockToken === body.data.lockToken && lock.expiresAt > now;
+      !!lock &&
+      lock.lockedByUserId === me.id &&
+      lock.lockToken === body.data.lockToken;
 
-    if (!valid) return errorJson(409, "LOCK_INVALID", "Lock not held by caller");
-
-    const updated = await prisma.formEditLock.update({
-      where: { patientSessionId_formType: { patientSessionId: p.data.id, formType: p.data.formType } },
-      data: { expiresAt },
-      select: { lockToken: true, expiresAt: true },
-    });
+    if (!valid)
+      return errorJson(409, "LOCK_INVALID", "Lock not held by caller");
 
     const response: RenewLockResponse = {
       ok: true,
       message: "Lock renewed successfully",
-      lockToken: updated.lockToken,
-      expiresAt: updated.expiresAt.toISOString(),
+      lockToken: lock.lockToken,
     };
 
     return noStore(json(response, { status: 200 }));

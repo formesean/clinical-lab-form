@@ -103,8 +103,6 @@ Response: `200 OK`
   "access_token": "jwt",
   "refresh_token": "jwt",
   "token_type": "bearer",
-  "expires_in": 3600,
-  "expires_at": 1700000000,
   "profile": {
     "id": "uuid",
     "email": "user@example.com",
@@ -124,6 +122,7 @@ Response: `200 OK`
 Notes:
 
 - Sets `sb_access_token` and `sb_refresh_token` cookies (HttpOnly).
+- API requests auto-refresh expired access tokens using `sb_refresh_token`.
 
 #### `POST /api/auth/logout`
 
@@ -508,7 +507,7 @@ Notes:
 
 ### Form Locks
 
-Locks prevent simultaneous edits to the same form. The lock TTL is `LOCK_TTL_SECONDS` (default 180, min 60, max 600).
+Locks prevent simultaneous edits to the same form until explicitly released by the lock holder.
 
 #### `POST /api/patients/:id/forms/:formType/lock`
 
@@ -528,8 +527,7 @@ Response: `200 OK`
 {
   "ok": true,
   "message": "Lock acquired successfully",
-  "lockToken": "uuid",
-  "expiresAt": "2026-01-01T00:00:00.000Z"
+  "lockToken": "uuid"
 }
 ```
 
@@ -569,8 +567,7 @@ Response: `200 OK`
 {
   "ok": true,
   "message": "Lock renewed successfully",
-  "lockToken": "uuid",
-  "expiresAt": "2026-01-01T00:00:00.000Z"
+  "lockToken": "uuid"
 }
 ```
 
