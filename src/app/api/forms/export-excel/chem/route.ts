@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import path from "path";
+import { toArrayBuffer } from "@/lib/to-array-buffer";
 import { readFile } from "fs/promises";
 import JSZip from "jszip";
 import { FormType, Sex } from "@prisma/client";
@@ -24,47 +25,50 @@ export async function POST(req: Request) {
   try {
     body = await req.json();
   } catch {
-    return NextResponse.json(
-      { error: "Invalid JSON body" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
   const raw = body as Record<string, unknown>;
   const sex = raw.sex as string | undefined;
   const unit = raw.unit as string | undefined;
   const formType = raw.formType as FormType | undefined;
-  const data = raw.data && typeof raw.data === "object"
-    ? (raw.data as Record<string, unknown>)
-    : {};
+  const data =
+    raw.data && typeof raw.data === "object"
+      ? (raw.data as Record<string, unknown>)
+      : {};
 
   if (!sex || !Object.values(Sex).includes(sex as Sex)) {
     return NextResponse.json(
       { error: "Missing or invalid 'sex'. Must be MALE or FEMALE." },
-      { status: 400 }
+      { status: 400 },
     );
   }
   if (!unit || !UNIT.includes(unit as Unit)) {
     return NextResponse.json(
       { error: "Missing or invalid 'unit'. Must be conv or si." },
-      { status: 400 }
+      { status: 400 },
     );
   }
   if (!formType || typeof formType !== "string") {
     return NextResponse.json(
       { error: "Missing or invalid 'formType'." },
-      { status: 400 }
+      { status: 400 },
     );
   }
   if (formType !== "CHEM") {
     return NextResponse.json(
       { error: "Unsupported formType. Only CHEM is supported for now." },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
   const templateFilename = getTemplateFilename(sex as Sex, unit as Unit);
-  const templatePath = path.join(process.cwd(), "src", "templates", "FORM_TEMPLATES.xlsm");
+  const templatePath = path.join(
+    process.cwd(),
+    "src",
+    "templates",
+    "FORM_TEMPLATES.xlsm",
+  );
 
   let templateBuffer: Buffer;
   try {
@@ -73,7 +77,7 @@ export async function POST(req: Request) {
     console.error("Failed to read Excel template:", err);
     return NextResponse.json(
       { error: "Template file not found", template: "FORM_TEMPLATES.xlsm" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 
@@ -87,19 +91,19 @@ export async function POST(req: Request) {
   if (!targetSheet) {
     return NextResponse.json(
       { error: "Worksheet not found", sheet: sheetName },
-      { status: 500 }
+      { status: 500 },
     );
   }
 
   const workbookRels = parseRelationships(workbookRelsXml);
   const worksheetRels = workbookRels.filter((rel) =>
-    rel.type.includes("/worksheet")
+    rel.type.includes("/worksheet"),
   );
   const targetRel = worksheetRels.find((rel) => rel.id === targetSheet.rId);
   if (!targetRel) {
     return NextResponse.json(
       { error: "Worksheet relationship not found", sheet: sheetName },
-      { status: 500 }
+      { status: 500 },
     );
   }
 
@@ -115,7 +119,7 @@ export async function POST(req: Request) {
 
   // CHEM: data columns depend on unit (Conv. = D, SI = H)
   const dataCol = (unit as Unit) === "si" ? "H" : "D";
-  const v = (x: unknown): CellValue => (x as CellValue);
+  const v = (x: unknown): CellValue => x as CellValue;
   const val = (cuKey: string, suKey: string) =>
     v((unit as Unit) === "si" ? data[suKey] : data[cuKey]);
 
@@ -128,7 +132,10 @@ export async function POST(req: Request) {
   cellUpdates.set("I14", v(data["patient.middleName"]));
   cellUpdates.set("A18", v(data["patient.dateOfBirth"]));
   cellUpdates.set("D18", v(data["patient.age"]));
-  cellUpdates.set("F18", v(data["patient.sex"] ?? (sex === "MALE" ? "MALE" : "FEMALE")));
+  cellUpdates.set(
+    "F18",
+    v(data["patient.sex"] ?? (sex === "MALE" ? "MALE" : "FEMALE")),
+  );
   cellUpdates.set("H18", v(data["patient.requestingPhysician"]));
   cellUpdates.set("A20", v(data["chem.datePerf"]));
   cellUpdates.set("D20", v(data["chem.timePerf"]));
@@ -153,7 +160,10 @@ export async function POST(req: Request) {
   cellUpdates.set(`${dataCol}42`, val("chem.ib_CU_val", "chem.ib_SU_val"));
   cellUpdates.set(`${dataCol}43`, val("chem.ggt_CU_val", "chem.ggt_SU_val"));
   cellUpdates.set(`${dataCol}44`, val("chem.alp_CU_val", "chem.alp_SU_val"));
-  cellUpdates.set(`${dataCol}45`, val("chem.hba1c_CU_val", "chem.hba1c_SU_val"));
+  cellUpdates.set(
+    `${dataCol}45`,
+    val("chem.hba1c_CU_val", "chem.hba1c_SU_val"),
+  );
   cellUpdates.set("C47", v(data["chem.remarks"]));
   cellUpdates.set("A51", v(data["chem.perfByName"]));
 
@@ -169,16 +179,21 @@ export async function POST(req: Request) {
   workbookXml = updateWorkbookXml(workbookXml, targetSheet);
   const updatedWorkbookRelsXml = filterWorkbookRelationships(
     workbookRelsXml,
-    targetSheet.rId
+    targetSheet.rId,
   );
   const removedSheetParts = worksheetRels
     .filter((rel) => rel.id !== targetSheet.rId)
     .map((rel) => normalizeZipPath(`xl/${rel.target}`));
-  const removedPartSet = new Set<string>(removedSheetParts.map((part) => `/${part}`));
+  const removedPartSet = new Set<string>(
+    removedSheetParts.map((part) => `/${part}`),
+  );
   removedPartSet.add("/xl/calcChain.xml");
 
   const contentTypesXml = await readZipText(zip, "[Content_Types].xml");
-  const updatedContentTypesXml = filterContentTypes(contentTypesXml, removedPartSet);
+  const updatedContentTypesXml = filterContentTypes(
+    contentTypesXml,
+    removedPartSet,
+  );
 
   for (const removed of removedSheetParts) {
     zip.remove(removed);
@@ -195,10 +210,9 @@ export async function POST(req: Request) {
 
   const buffer = await zip.generateAsync({ type: "nodebuffer" });
 
-  return new NextResponse(buffer, {
+  return new NextResponse(toArrayBuffer(buffer), {
     headers: {
-      "Content-Type":
-        "application/vnd.ms-excel.sheet.macroEnabled.12",
+      "Content-Type": "application/vnd.ms-excel.sheet.macroEnabled.12",
       "Content-Disposition": `attachment; filename="${templateFilename}"`,
     },
   });
@@ -262,7 +276,7 @@ function parseWorkbookSheets(workbookXml: string): WorkbookSheet[] {
 function updateWorkbookXml(workbookXml: string, sheet: WorkbookSheet): string {
   let updated = workbookXml.replace(
     /<sheets>[\s\S]*?<\/sheets>/,
-    `<sheets>${sheet.raw}</sheets>`
+    `<sheets>${sheet.raw}</sheets>`,
   );
   updated = updated.replace(/activeTab="\\d+"/, 'activeTab="0"');
   updated = updateDefinedNames(updated, sheet);
@@ -315,7 +329,10 @@ function parseRelationships(relXml: string): RelationshipInfo[] {
   return rels;
 }
 
-function filterWorkbookRelationships(relXml: string, keepWorksheetId: string): string {
+function filterWorkbookRelationships(
+  relXml: string,
+  keepWorksheetId: string,
+): string {
   const startTagMatch = relXml.match(/<Relationships[^>]*>/);
   const startTag = startTagMatch
     ? startTagMatch[0]
@@ -333,7 +350,10 @@ function filterWorkbookRelationships(relXml: string, keepWorksheetId: string): s
   return `${startTag}${kept.map((rel) => rel.raw).join("")}</Relationships>`;
 }
 
-function filterContentTypes(contentTypesXml: string, removedParts: Set<string>): string {
+function filterContentTypes(
+  contentTypesXml: string,
+  removedParts: Set<string>,
+): string {
   const startTagMatch = contentTypesXml.match(/<Types[^>]*>/);
   const startTag = startTagMatch
     ? startTagMatch[0]
@@ -371,9 +391,7 @@ function parseSharedStrings(sharedStringsXml: string): SharedStringsState {
   const uniqueCount = uniqueMatch
     ? Number.parseInt(uniqueMatch[1], 10)
     : siCount;
-  const count = countMatch
-    ? Number.parseInt(countMatch[1], 10)
-    : uniqueCount;
+  const count = countMatch ? Number.parseInt(countMatch[1], 10) : uniqueCount;
   const indexByText = new Map<string, number>();
 
   const siRegex = /<si>([\s\S]*?)<\/si>/g;
@@ -404,7 +422,7 @@ function extractSharedStringText(sharedStringXml: string): string {
 
 function normalizeCellValue(
   value: CellValue,
-  sharedStrings: SharedStringsState
+  sharedStrings: SharedStringsState,
 ): NormalizedCellValue {
   if (value === null || value === undefined || value === "") {
     return { kind: "empty" };
@@ -430,12 +448,17 @@ function normalizeCellValue(
   return { kind: "string", value: text, sharedIndex: newIndex };
 }
 
-function appendSharedStrings(sharedStringsXml: string, sharedStrings: SharedStringsState): string {
+function appendSharedStrings(
+  sharedStringsXml: string,
+  sharedStrings: SharedStringsState,
+): string {
   const insertPos = sharedStringsXml.lastIndexOf("</sst>");
   if (insertPos === -1) {
     return sharedStringsXml;
   }
-  const additions = sharedStrings.pending.map((text) => buildSharedStringEntry(text)).join("");
+  const additions = sharedStrings.pending
+    .map((text) => buildSharedStringEntry(text))
+    .join("");
   const nextUnique = sharedStrings.uniqueCount + sharedStrings.pending.length;
   const nextCount = Math.max(sharedStrings.count, nextUnique);
   let updated = `${sharedStringsXml.slice(0, insertPos)}${additions}${sharedStringsXml.slice(insertPos)}`;
@@ -443,7 +466,10 @@ function appendSharedStrings(sharedStringsXml: string, sharedStrings: SharedStri
     updated = updated.replace(/count="(\d+)"/, `count="${nextCount}"`);
   }
   if (sharedStringsXml.includes('uniqueCount="')) {
-    updated = updated.replace(/uniqueCount="(\d+)"/, `uniqueCount="${nextUnique}"`);
+    updated = updated.replace(
+      /uniqueCount="(\d+)"/,
+      `uniqueCount="${nextUnique}"`,
+    );
   }
   return updated;
 }
@@ -451,7 +477,10 @@ function appendSharedStrings(sharedStringsXml: string, sharedStrings: SharedStri
 function buildSharedStringEntry(text: string): string {
   const escaped = encodeXml(text);
   const needsPreserve =
-    /^\s|\s$/.test(text) || text.includes("\n") || text.includes("\t") || / {2,}/.test(text);
+    /^\s|\s$/.test(text) ||
+    text.includes("\n") ||
+    text.includes("\t") ||
+    / {2,}/.test(text);
   const preserveAttr = needsPreserve ? ' xml:space="preserve"' : "";
   return `<si><t${preserveAttr}>${escaped}</t></si>`;
 }
@@ -459,7 +488,7 @@ function buildSharedStringEntry(text: string): string {
 function setCellValue(
   sheetXml: string,
   cellRef: string,
-  value: NormalizedCellValue
+  value: NormalizedCellValue,
 ): string {
   const cellRange = findCellRange(sheetXml, cellRef);
   const cellXml = buildCellXml(cellRange?.openTag, cellRef, value);
@@ -472,7 +501,7 @@ function setCellValue(
 function buildCellXml(
   openTag: string | null | undefined,
   cellRef: string,
-  value: NormalizedCellValue
+  value: NormalizedCellValue,
 ): string {
   const attrs = parseCellAttributes(openTag);
   attrs.set("r", cellRef);
@@ -493,14 +522,16 @@ function buildCellXml(
     value.kind === "string"
       ? String(value.sharedIndex)
       : value.kind === "boolean"
-        ? value.value ? "1" : "0"
+        ? value.value
+          ? "1"
+          : "0"
         : String(value.value);
   return `<c${attrString}><v>${v}</v></c>`;
 }
 
 function findCellRange(
   sheetXml: string,
-  cellRef: string
+  cellRef: string,
 ): { start: number; end: number; openTag: string } | null {
   const refIndex = sheetXml.indexOf(`r="${cellRef}"`);
   if (refIndex === -1) {
@@ -526,7 +557,11 @@ function findCellRange(
   return { start, end: closeTag + 4, openTag };
 }
 
-function insertCell(sheetXml: string, cellRef: string, cellXml: string): string {
+function insertCell(
+  sheetXml: string,
+  cellRef: string,
+  cellXml: string,
+): string {
   const { row } = splitCellRef(cellRef);
   const rowRegex = new RegExp(`<row[^>]* r="${row}"[^>]*>[\\s\\S]*?</row>`);
   const rowMatch = rowRegex.exec(sheetXml);
@@ -542,11 +577,15 @@ function insertCell(sheetXml: string, cellRef: string, cellXml: string): string 
   const rowXml = rowMatch[0];
   const updatedRowXml = insertCellIntoRow(rowXml, cellRef, cellXml);
   return `${sheetXml.slice(0, rowMatch.index)}${updatedRowXml}${sheetXml.slice(
-    rowMatch.index + rowXml.length
+    rowMatch.index + rowXml.length,
   )}`;
 }
 
-function insertCellIntoRow(rowXml: string, cellRef: string, cellXml: string): string {
+function insertCellIntoRow(
+  rowXml: string,
+  cellRef: string,
+  cellXml: string,
+): string {
   const { col } = splitCellRef(cellRef);
   const targetCol = columnToNumber(col);
   const cellRegex = /<c[^>]* r="([A-Z]+)\d+"[^>]*(?:\/>|>[\s\S]*?<\/c>)/g;
@@ -605,7 +644,7 @@ function decodeXml(text: string): string {
   return text
     .replaceAll("&lt;", "<")
     .replaceAll("&gt;", ">")
-    .replaceAll("&quot;", "\"")
+    .replaceAll("&quot;", '"')
     .replaceAll("&apos;", "'")
     .replaceAll("&amp;", "&");
 }
@@ -615,7 +654,7 @@ function encodeXml(text: string): string {
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
-    .replaceAll("\"", "&quot;")
+    .replaceAll('"', "&quot;")
     .replaceAll("'", "&apos;");
 }
 
