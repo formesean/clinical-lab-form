@@ -23,9 +23,80 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 import { Field, FieldContent, FieldDescription, FieldGroup, FieldLabel, FieldTitle } from "./ui/field"
 import { Checkbox } from "./ui/checkbox"
 
+const PATIENT_ID_PREFIX = "DCVCL-"
+const MONTHS_BY_SHORT_NAME: Record<string, number> = {
+    jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6,
+    jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12,
+}
+
+type DateParts = {
+    year: number
+    month: number
+    day: number
+}
+
+const isValidDateParts = ({ year, month, day }: DateParts) => {
+    const candidate = new Date(year, month - 1, day)
+    return (
+        candidate.getFullYear() === year &&
+        candidate.getMonth() === month - 1 &&
+        candidate.getDate() === day
+    )
+}
+
+const parseDateOfBirthParts = (value: string): DateParts | null => {
+    const trimmed = value.trim()
+    if (!trimmed) return null
+
+    const isoDateMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(trimmed)
+    if (isoDateMatch) {
+        const parts = {
+            year: Number(isoDateMatch[1]),
+            month: Number(isoDateMatch[2]),
+            day: Number(isoDateMatch[3]),
+        }
+        return isValidDateParts(parts) ? parts : null
+    }
+
+    const dmyMatch = /^(\d{1,2})\/([A-Za-z]{3})\/(\d{4})$/.exec(trimmed)
+    if (dmyMatch) {
+        const month = MONTHS_BY_SHORT_NAME[dmyMatch[2].toLowerCase()]
+        if (!month) return null
+
+        const parts = {
+            day: Number(dmyMatch[1]),
+            month,
+            year: Number(dmyMatch[3]),
+        }
+        return isValidDateParts(parts) ? parts : null
+    }
+
+    return null
+}
+
+const toIsoDateAtMidnight = ({ year, month, day }: DateParts) => {
+    const mm = String(month).padStart(2, "0")
+    const dd = String(day).padStart(2, "0")
+    return new Date(`${year}-${mm}-${dd}T00:00:00`).toISOString()
+}
+
+const calculateAgeFromDateParts = ({ year, month, day }: DateParts) => {
+    const today = new Date()
+    let computedAge = today.getFullYear() - year
+    const hasBirthdayPassedThisYear =
+        today.getMonth() + 1 > month ||
+        (today.getMonth() + 1 === month && today.getDate() >= day)
+
+    if (!hasBirthdayPassedThisYear) {
+        computedAge -= 1
+    }
+
+    return Math.max(computedAge, 0)
+}
+
 export default function AddPatient() {
     const [fullName, setFullName] = useState<string>("")
-    const [patientIdNum, setPatientIdNum] = useState<string>("")
+    const [patientIdNum, setPatientIdNum] = useState<string>(PATIENT_ID_PREFIX)
     const [lastName, setLastName] = useState<string>("")
     const [firstName, setFirstName] = useState<string>("")
     const [middleName, setMiddleName] = useState<string>("")
@@ -54,28 +125,67 @@ export default function AddPatient() {
         const trimmed = value.trim()
         if (!trimmed) return ""
 
-        const isoDateMatch = /^\d{4}-\d{2}-\d{2}$/.exec(trimmed)
-        if (isoDateMatch) {
-            return new Date(`${trimmed}T00:00:00`).toISOString()
-        }
-
-        const dmyMatch = /^(\d{1,2})\/([A-Za-z]{3})\/(\d{4})$/.exec(trimmed)
-        if (dmyMatch) {
-            const day = Number(dmyMatch[1])
-            const monthToken = dmyMatch[2].toLowerCase()
-            const year = Number(dmyMatch[3])
-            const months: Record<string, number> = {
-                jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6,
-                jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12,
-            }
-            const month = months[monthToken]
-            if (!month) return trimmed
-            const dd = String(day).padStart(2, "0")
-            const mm = String(month).padStart(2, "0")
-            return new Date(`${year}-${mm}-${dd}T00:00:00`).toISOString()
+        const parsedParts = parseDateOfBirthParts(trimmed)
+        if (parsedParts) {
+            return toIsoDateAtMidnight(parsedParts)
         }
 
         return trimmed
+    }
+
+    const handleDateOfBirthChange = (value: string) => {
+        setDateOfBirth(value)
+        if (!value.trim()) {
+            setAge(0)
+            return
+        }
+
+        const parsedParts = parseDateOfBirthParts(value)
+        if (parsedParts) {
+            setAge(calculateAgeFromDateParts(parsedParts))
+        }
+    }
+
+    const handlePatientIdNumChange = (value: string) => {
+        const suffix = value.startsWith(PATIENT_ID_PREFIX)
+            ? value.slice(PATIENT_ID_PREFIX.length)
+            : value.replace(/^dcvcl-?/i, "")
+
+        setPatientIdNum(`${PATIENT_ID_PREFIX}${suffix}`)
+    }
+
+    const handlePatientIdNumKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        const input = e.currentTarget
+        const selectionStart = input.selectionStart ?? 0
+        const selectionEnd = input.selectionEnd ?? 0
+        const prefixLength = PATIENT_ID_PREFIX.length
+        const isDeleting = e.key === "Backspace" || e.key === "Delete"
+        const isTyping = e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey
+
+        if ((isDeleting || isTyping) && selectionStart < prefixLength) {
+            e.preventDefault()
+            input.setSelectionRange(prefixLength, Math.max(prefixLength, selectionEnd))
+        }
+    }
+
+    const handlePatientIdNumFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+        const input = e.currentTarget
+        const prefixLength = PATIENT_ID_PREFIX.length
+        if ((input.selectionStart ?? 0) < prefixLength) {
+            input.setSelectionRange(prefixLength, prefixLength)
+        }
+    }
+
+    const resetForm = () => {
+        setPatientIdNum(PATIENT_ID_PREFIX)
+        setLastName("")
+        setFirstName("")
+        setMiddleName("")
+        setDateOfBirth("")
+        setAge(0)
+        setSex("MALE")
+        setRequestingPhysician("")
+        setRequestedForms([])
     }
 
     const handleAddPatient = async (e: React.FormEvent) => {
@@ -114,6 +224,7 @@ export default function AddPatient() {
             }
             console.log("Success:", data);
 
+            resetForm()
             setOpen(false);
         } catch (err: unknown) {
             console.error(err instanceof Error ? err.message : err);
@@ -130,7 +241,9 @@ export default function AddPatient() {
                     </div>
                 </div>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent
+                onOpenAutoFocus={(e) => e.preventDefault()}
+            >
                 <DialogHeader>
                     <DialogTitle className="text-[#135A39] text-2xl font-bold">Add New Patient</DialogTitle>
                     <DialogDescription>
@@ -144,10 +257,12 @@ export default function AddPatient() {
                         <Input
                             id="patientIdNum"
                             type="text"
-                            placeholder="P-0001"
+                            placeholder="DCVCL-0001"
                             className="text-[#111827] placeholder:text-[#9CA3AF] selection:bg-[#135A39] selection:text-white"
                             value={patientIdNum}
-                            onChange={(e) => setPatientIdNum(e.target.value)}
+                            onChange={(e) => handlePatientIdNumChange(e.target.value)}
+                            onKeyDown={handlePatientIdNumKeyDown}
+                            onFocus={handlePatientIdNumFocus}
                         />
                     </div>
                     <div className="flex gap-3">
@@ -196,7 +311,7 @@ export default function AddPatient() {
                                 placeholder="dd/mmm/yyyy"
                                 className="text-[#111827] placeholder:text-[#9CA3AF] selection:bg-[#135A39] selection:text-white"
                                 value={dateOfBirth}
-                                onChange={(e) => setDateOfBirth(e.target.value)}
+                                onChange={(e) => handleDateOfBirthChange(e.target.value)}
                             />
                             {/* <DatePicker /> */}
                         </div>
