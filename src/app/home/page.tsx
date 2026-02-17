@@ -28,7 +28,6 @@ import PatientInfo from "@/components/PatientInfo";
 
 export default function Home() {
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
-  console.log(selectedPatientId)
 
   return (
     <div className="flex flex-col min-h-screen bg-[#E6F3ED]">
