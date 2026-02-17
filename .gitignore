@@ -63,3 +63,8 @@ src/lib/generated/prisma/runtime/index-browser.d.ts
 src/lib/generated/prisma/runtime/index-browser.js
 src/lib/generated/prisma/runtime/wasm-compiler-edge.js
 cookies.txt
+.idea/.gitignore
+.idea/clinical-lab-form.iml
+.idea/material_theme_project_new.xml
+.idea/modules.xml
+.idea/vcs.xml
