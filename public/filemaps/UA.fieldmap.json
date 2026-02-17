@@ -1,0 +1,247 @@
+{
+  "kind": "pdf",
+  "filename": "UA.pdf",
+  "meta": {
+    "scale": 1.25,
+    "pageCount": 1,
+    "pages": [
+      {
+        "page": 1,
+        "width": 765,
+        "height": 990
+      }
+    ]
+  },
+  "fields": [
+    {
+      "key": "ua.remarks",
+      "page": 1,
+      "xPx": 113,
+      "yPx": 848,
+      "wPx": 611,
+      "hPx": 17,
+      "xPct": 0.147712,
+      "yPct": 0.856566,
+      "wPct": 0.798693,
+      "hPct": 0.017172
+    },
+    {
+      "key": "ua.perfByName",
+      "page": 1,
+      "xPx": 58,
+      "yPx": 903,
+      "wPx": 200,
+      "hPx": 19,
+      "xPct": 0.075817,
+      "yPct": 0.912121,
+      "wPct": 0.261438,
+      "hPct": 0.019192
+    },
+    {
+      "key": "patient.patientIdNum",
+      "page": 1,
+      "xPx": 234,
+      "yPx": 194,
+      "wPx": 153,
+      "hPx": 16,
+      "xPct": 0.305882,
+      "yPct": 0.19596,
+      "wPct": 0.2,
+      "hPct": 0.016162
+    },
+    {
+      "key": "ua.dateOfReq",
+      "page": 1,
+      "xPx": 414,
+      "yPx": 194,
+      "wPx": 178,
+      "hPx": 16,
+      "xPct": 0.541176,
+      "yPct": 0.19596,
+      "wPct": 0.23268,
+      "hPct": 0.016162
+    },
+    {
+      "key": "ua.timeOfReq",
+      "page": 1,
+      "xPx": 604,
+      "yPx": 194,
+      "wPx": 114,
+      "hPx": 16,
+      "xPct": 0.789542,
+      "yPct": 0.19596,
+      "wPct": 0.14902,
+      "hPct": 0.016162
+    },
+    {
+      "key": "patient.lastName",
+      "page": 1,
+      "xPx": 43,
+      "yPx": 223,
+      "wPx": 167,
+      "hPx": 16,
+      "xPct": 0.056209,
+      "yPct": 0.225253,
+      "wPct": 0.218301,
+      "hPct": 0.016162
+    },
+    {
+      "key": "patient.firstName",
+      "page": 1,
+      "xPx": 287,
+      "yPx": 223,
+      "wPx": 170,
+      "hPx": 16,
+      "xPct": 0.375163,
+      "yPct": 0.225253,
+      "wPct": 0.222222,
+      "hPct": 0.016162
+    },
+    {
+      "key": "patient.middleName",
+      "page": 1,
+      "xPx": 533,
+      "yPx": 223,
+      "wPx": 185,
+      "hPx": 16,
+      "xPct": 0.696732,
+      "yPct": 0.225253,
+      "wPct": 0.24183,
+      "hPct": 0.016162
+    },
+    {
+      "key": "patient.requestingPhysician",
+      "page": 1,
+      "xPx": 475,
+      "yPx": 277,
+      "wPx": 243,
+      "hPx": 16,
+      "xPct": 0.620915,
+      "yPct": 0.279798,
+      "wPct": 0.317647,
+      "hPct": 0.016162
+    },
+    {
+      "key": "patient.sex",
+      "page": 1,
+      "xPx": 363,
+      "yPx": 277,
+      "wPx": 79,
+      "hPx": 16,
+      "xPct": 0.47451,
+      "yPct": 0.279798,
+      "wPct": 0.103268,
+      "hPct": 0.016162
+    },
+    {
+      "key": "patient.age",
+      "page": 1,
+      "xPx": 244,
+      "yPx": 277,
+      "wPx": 73,
+      "hPx": 16,
+      "xPct": 0.318954,
+      "yPct": 0.279798,
+      "wPct": 0.095425,
+      "hPct": 0.016162,
+      "inputType": "number"
+    },
+    {
+      "key": "patient.dateOfBirth",
+      "page": 1,
+      "xPx": 44,
+      "yPx": 277,
+      "wPx": 163,
+      "hPx": 16,
+      "xPct": 0.057516,
+      "yPct": 0.279798,
+      "wPct": 0.213072,
+      "hPct": 0.016162
+    },
+    {
+      "key": "ua.datePerf",
+      "page": 1,
+      "xPx": 44,
+      "yPx": 310,
+      "wPx": 162,
+      "hPx": 16,
+      "xPct": 0.057516,
+      "yPct": 0.313131,
+      "wPct": 0.211765,
+      "hPct": 0.016162
+    },
+    {
+      "key": "ua.timePerf",
+      "page": 1,
+      "xPx": 216,
+      "yPx": 310,
+      "wPx": 114,
+      "hPx": 16,
+      "xPct": 0.282353,
+      "yPct": 0.313131,
+      "wPct": 0.14902,
+      "hPct": 0.016162
+    },
+    {
+      "key": "ua.dateRel",
+      "page": 1,
+      "xPx": 352,
+      "yPx": 310,
+      "wPx": 121,
+      "hPx": 16,
+      "xPct": 0.460131,
+      "yPct": 0.313131,
+      "wPct": 0.15817,
+      "hPct": 0.016162
+    },
+    {
+      "key": "ua.timeRel",
+      "page": 1,
+      "xPx": 482,
+      "yPx": 310,
+      "wPx": 94,
+      "hPx": 16,
+      "xPct": 0.630065,
+      "yPct": 0.313131,
+      "wPct": 0.122876,
+      "hPct": 0.016162
+    },
+    {
+      "key": "ua.location",
+      "page": 1,
+      "xPx": 598,
+      "yPx": 310,
+      "wPx": 120,
+      "hPx": 16,
+      "xPct": 0.781699,
+      "yPct": 0.313131,
+      "wPct": 0.156863,
+      "hPct": 0.016162
+    },
+    {
+      "key": "ua.labIdNum",
+      "page": 1,
+      "xPx": 45,
+      "yPx": 194,
+      "wPx": 161,
+      "hPx": 16,
+      "xPct": 0.058824,
+      "yPct": 0.19596,
+      "wPct": 0.210458,
+      "hPct": 0.016162
+    },
+    {
+      "key": "ua.perfByLic",
+      "page": 1,
+      "xPx": 153,
+      "yPx": 933,
+      "wPx": 56,
+      "hPx": 19,
+      "xPct": 0.2,
+      "yPct": 0.942424,
+      "wPct": 0.073203,
+      "hPct": 0.019192,
+      "inputType": "number"
+    }
+  ]
+}
