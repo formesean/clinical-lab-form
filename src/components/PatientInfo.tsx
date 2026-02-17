@@ -85,18 +85,18 @@ export default function PatientInfo({ selectedPatientId }: PatientIdProp) {
 
   const orderedForms = patientInfo?.requestedForms
     ? [...patientInfo.requestedForms].sort((a, b) => {
-        const aIndex = FORM_ORDER.indexOf(a as (typeof FORM_ORDER)[number]);
-        const bIndex = FORM_ORDER.indexOf(b as (typeof FORM_ORDER)[number]);
+      const aIndex = FORM_ORDER.indexOf(a as (typeof FORM_ORDER)[number]);
+      const bIndex = FORM_ORDER.indexOf(b as (typeof FORM_ORDER)[number]);
 
-        const safeAIndex = aIndex === -1 ? Number.POSITIVE_INFINITY : aIndex;
-        const safeBIndex = bIndex === -1 ? Number.POSITIVE_INFINITY : bIndex;
+      const safeAIndex = aIndex === -1 ? Number.POSITIVE_INFINITY : aIndex;
+      const safeBIndex = bIndex === -1 ? Number.POSITIVE_INFINITY : bIndex;
 
-        if (safeAIndex !== safeBIndex) {
-          return safeAIndex - safeBIndex;
-        }
+      if (safeAIndex !== safeBIndex) {
+        return safeAIndex - safeBIndex;
+      }
 
-        return a.localeCompare(b);
-      })
+      return a.localeCompare(b);
+    })
     : [];
 
   const handleEditToggle = async () => {
@@ -135,21 +135,21 @@ export default function PatientInfo({ selectedPatientId }: PatientIdProp) {
 
   const patientFieldValues: Record<string, string> = patientInfo
     ? {
-        "patient.patientIdNum": patientInfo.patientIdNum ?? "",
-        "patient.lastName": patientInfo.lastName ?? "",
-        "patient.firstName": patientInfo.firstName ?? "",
-        "patient.middleName": patientInfo.middleName ?? "",
-        "patient.dateOfBirth": (() => {
-          if (!patientInfo.dateOfBirth) return "";
-          const parsed = new Date(patientInfo.dateOfBirth);
-          return Number.isNaN(parsed.getTime())
-            ? patientInfo.dateOfBirth
-            : formatDisplayDate(parsed);
-        })(),
-        "patient.age": String(patientInfo.age ?? ""),
-        "patient.sex": patientInfo.sex ?? "",
-        "patient.requestingPhysician": patientInfo.requestingPhysician ?? "",
-      }
+      "patient.patientIdNum": patientInfo.patientIdNum ?? "",
+      "patient.lastName": patientInfo.lastName ?? "",
+      "patient.firstName": patientInfo.firstName ?? "",
+      "patient.middleName": patientInfo.middleName ?? "",
+      "patient.dateOfBirth": (() => {
+        if (!patientInfo.dateOfBirth) return "";
+        const parsed = new Date(patientInfo.dateOfBirth);
+        return Number.isNaN(parsed.getTime())
+          ? patientInfo.dateOfBirth
+          : formatDisplayDate(parsed);
+      })(),
+      "patient.age": String(patientInfo.age ?? ""),
+      "patient.sex": patientInfo.sex ?? "",
+      "patient.requestingPhysician": patientInfo.requestingPhysician ?? "",
+    }
     : {};
 
   const handleDownload = async () => {
@@ -374,13 +374,13 @@ export default function PatientInfo({ selectedPatientId }: PatientIdProp) {
                 Date Created:{" "}
                 {patientInfo?.createdAt
                   ? new Date(patientInfo.createdAt).toLocaleDateString(
-                      "en-PH",
-                      {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      }
-                    )
+                    "en-PH",
+                    {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    }
+                  )
                   : ""}
               </div>
             </CardDescription>
@@ -449,9 +449,9 @@ export default function PatientInfo({ selectedPatientId }: PatientIdProp) {
                             values={{
                               ...(patientInfo
                                 ? buildRequisitionDefaults(
-                                    formType as FormType,
-                                    new Date(patientInfo.createdAt),
-                                  )
+                                  formType as FormType,
+                                  new Date(patientInfo.createdAt),
+                                )
                                 : {}),
                               ...(formValues[formType] ?? {}),
                               ...patientFieldValues,

@@ -685,11 +685,10 @@ export default function AdminMapperPage() {
                                   e.stopPropagation();
                                   setSelectedId(r.id);
                                 }}
-                                className={`absolute ${
-                                  r.id === selectedId
+                                className={`absolute ${r.id === selectedId
                                     ? "border-[3px] border-[#0d3d2a] bg-[#135A39]/30 shadow-md"
                                     : "border-2 border-[#6B9080] bg-[#6B9080]/10"
-                                }`}
+                                  }`}
                                 style={{
                                   left: `${r.x}px`,
                                   top: `${r.y}px`,
@@ -756,11 +755,10 @@ export default function AdminMapperPage() {
                                 e.stopPropagation();
                                 setSelectedId(r.id);
                               }}
-                              className={`absolute ${
-                                r.id === selectedId
+                              className={`absolute ${r.id === selectedId
                                   ? "border-[3px] border-[#0d3d2a] bg-[#135A39]/30 shadow-md"
                                   : "border-2 border-[#6B9080] bg-[#6B9080]/10"
-                              }`}
+                                }`}
                               style={{
                                 left: r.x,
                                 top: r.y,
@@ -945,11 +943,10 @@ export default function AdminMapperPage() {
                         <li key={r.id}>
                           <button
                             type="button"
-                            className={`w-full rounded px-2 py-1 text-left text-xs ${
-                              r.id === selectedId
+                            className={`w-full rounded px-2 py-1 text-left text-xs ${r.id === selectedId
                                 ? "bg-[#DDEAE3] text-[#135A39]"
                                 : "hover:bg-[#E6F3ED]"
-                            }`}
+                              }`}
                             onClick={() => setSelectedId(r.id)}
                           >
                             <div className="flex justify-between gap-2">
