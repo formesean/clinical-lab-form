@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import ExcelJS from "exceljs";
 import path from "path";
+import { toArrayBuffer } from "@/lib/to-array-buffer";
 import { FormType, Sex } from "@prisma/client";
 
 function getTemplateFilename(ageInYears: number, sex: Sex): string {
@@ -24,10 +25,7 @@ export async function POST(req: Request) {
   try {
     body = await req.json();
   } catch {
-    return NextResponse.json(
-      { error: "Invalid JSON body" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
   const raw = body as Record<string, unknown>;
@@ -38,13 +36,16 @@ export async function POST(req: Request) {
   if (formType !== "CBC") {
     return NextResponse.json(
       { error: "This route is for CBC form type only." },
-      { status: 400 }
+      { status: 400 },
     );
   }
   if (age == null || typeof age !== "number" || age < 0) {
     return NextResponse.json(
-      { error: "Missing or invalid 'age'. Must be a non-negative number (age in years)." },
-      { status: 400 }
+      {
+        error:
+          "Missing or invalid 'age'. Must be a non-negative number (age in years).",
+      },
+      { status: 400 },
     );
   }
   const sexVal: Sex = sex === "FEMALE" ? "FEMALE" : "MALE";
@@ -54,7 +55,7 @@ export async function POST(req: Request) {
     process.cwd(),
     "src",
     "templates",
-    templateFilename
+    templateFilename,
   );
 
   const workbook = new ExcelJS.Workbook();
@@ -64,14 +65,14 @@ export async function POST(req: Request) {
     console.error("Failed to read Excel template:", err);
     return NextResponse.json(
       { error: "Template file not found", template: templateFilename },
-      { status: 500 }
+      { status: 500 },
     );
   }
 
   const sheet = workbook.worksheets[0];
 
   type CellValue = string | number | boolean | Date | null | undefined;
-  const v = (x: unknown): CellValue => (x as CellValue);
+  const v = (x: unknown): CellValue => x as CellValue;
   if (formType === "CBC") {
     sheet.getCell(`D26`).value = v(raw.wbc);
     sheet.getCell(`D27`).value = v(raw.rbc);
@@ -101,7 +102,7 @@ export async function POST(req: Request) {
 
   const buffer = await workbook.xlsx.writeBuffer();
 
-  return new NextResponse(buffer, {
+  return new NextResponse(toArrayBuffer(buffer), {
     headers: {
       "Content-Type":
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",

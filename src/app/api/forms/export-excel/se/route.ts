@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import ExcelJS from "exceljs";
 import path from "path";
+import { toArrayBuffer } from "@/lib/to-array-buffer";
 import { FormType } from "@prisma/client";
 
 export async function POST(req: Request) {
@@ -8,10 +9,7 @@ export async function POST(req: Request) {
   try {
     body = await req.json();
   } catch {
-    return NextResponse.json(
-      { error: "Invalid JSON body" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
   const raw = body as Record<string, unknown>;
@@ -20,16 +18,16 @@ export async function POST(req: Request) {
   if (!formType || typeof formType !== "string") {
     return NextResponse.json(
       { error: "Missing or invalid 'formType'." },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
-  const templateFilename = "UA MF.xlsx"
+  const templateFilename = "UA MF.xlsx";
   const templatePath = path.join(
     process.cwd(),
     "src",
     "templates",
-    templateFilename
+    templateFilename,
   );
 
   const workbook = new ExcelJS.Workbook();
@@ -39,14 +37,14 @@ export async function POST(req: Request) {
     console.error("Failed to read Excel template:", err);
     return NextResponse.json(
       { error: "Template file not found", template: templateFilename },
-      { status: 500 }
+      { status: 500 },
     );
   }
 
   const sheet = workbook.worksheets[0];
 
   type CellValue = string | number | boolean | Date | null | undefined;
-  const v = (x: unknown): CellValue => (x as CellValue);
+  const v = (x: unknown): CellValue => x as CellValue;
   if (formType === "SE") {
     sheet.getCell(`D27`).value = v(raw.color_result);
     sheet.getCell(`F27`).value = v(raw.color_id);
@@ -84,7 +82,7 @@ export async function POST(req: Request) {
 
   const buffer = await workbook.xlsx.writeBuffer();
 
-  return new NextResponse(buffer, {
+  return new NextResponse(toArrayBuffer(buffer), {
     headers: {
       "Content-Type":
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",

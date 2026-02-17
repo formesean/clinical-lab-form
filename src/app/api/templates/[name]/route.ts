@@ -1,14 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import path from "path";
+import { toArrayBuffer } from "@/lib/to-array-buffer";
 import fs from "fs";
 
 export async function GET(
   _req: NextRequest,
-  { params }: { params: Promise<{ name: string }> }
+  { params }: { params: Promise<{ name: string }> },
 ) {
   const { name } = await params;
   if (!name || name.includes("..") || name.includes("/")) {
-    return NextResponse.json({ error: "Invalid template name" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Invalid template name" },
+      { status: 400 },
+    );
   }
 
   const templatePath = path.join(process.cwd(), "src", "templates", name);
@@ -25,7 +29,7 @@ export async function GET(
         ? "application/json"
         : "application/octet-stream";
 
-  return new NextResponse(buffer, {
+  return new NextResponse(toArrayBuffer(buffer), {
     headers: {
       "Content-Type": contentType,
       "Content-Disposition": `inline; filename="${name}"`,
