@@ -160,7 +160,11 @@ export default function PatientInfo({ selectedPatientId }: PatientIdProp) {
 
     const unit = chemUnitMode === "SI" ? "si" : "conv";
     const dataToExport = {
+      ...(patientInfo
+        ? buildRequisitionDefaults(formType as FormType, new Date(patientInfo.createdAt))
+        : {}),
       ...(formValues[formType] ?? {}),
+      ...patientFieldValues,
     };
 
     const res = await fetch("/api/forms/export-excel/chem", {
