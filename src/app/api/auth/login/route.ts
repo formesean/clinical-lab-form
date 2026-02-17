@@ -1,10 +1,12 @@
+import { NextResponse } from "next/server";
+import z from "zod";
 import { ensureProfileForUser } from "@/lib/auth";
 import { errorJson, zodError } from "@/lib/http";
 import { prisma } from "@/lib/prisma";
 import { supabaseAuth } from "@/lib/supabase";
 import type { LoginRequest, LoginResponse } from "@/types/api/auth";
-import { NextResponse } from "next/server";
-import z from "zod";
+
+const SESSION_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 365 * 10;
 
 const Body = z.object({
   userIdNum: z.string().trim().min(3).max(64),
@@ -22,7 +24,7 @@ const Body = z.object({
  * - password: string (required)
  *
  * Returns (JSON):
- * - { access_token, refresh_token, token_type, expires_in, expires_at, profile }
+ * - { access_token, refresh_token, token_type, profile }
  *
  * Status codes:
  * - 200 OK
@@ -66,8 +68,6 @@ export async function POST(req: Request) {
   const response: LoginResponse = {
     access_token: data.session.access_token,
     refresh_token: data.session.refresh_token,
-    expires_in: data.session.expires_in ?? 0,
-    expires_at: data.session.expires_at ?? 0,
     token_type: (data.session.token_type ?? "bearer") as "bearer",
     profile: ensuredProfileDto,
   };
@@ -78,12 +78,12 @@ export async function POST(req: Request) {
 
   res.headers.append(
     "Set-Cookie",
-    `sb_access_token=${data.session.access_token}; Path=/; HttpOnly; SameSite=Lax; ${secure ? "Secure;" : ""} Max-Age=${Math.max(60, Number(data.session.expires_in) || 3600)}`
+    `sb_access_token=${data.session.access_token}; Path=/; HttpOnly; SameSite=Lax; ${secure ? "Secure;" : ""} Max-Age=${SESSION_COOKIE_MAX_AGE_SECONDS}`,
   );
 
   res.headers.append(
     "Set-Cookie",
-    `sb_refresh_token=${data.session.refresh_token}; Path=/; HttpOnly; SameSite=Lax; ${secure ? "Secure;" : ""} Max-Age=2592000`
+    `sb_refresh_token=${data.session.refresh_token}; Path=/; HttpOnly; SameSite=Lax; ${secure ? "Secure;" : ""} Max-Age=${SESSION_COOKIE_MAX_AGE_SECONDS}`,
   );
 
   res.headers.set("Cache-Control", "no-store");

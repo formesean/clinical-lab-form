@@ -112,13 +112,11 @@ model FormEditLock {
   formType         FormType
   lockedByUserId   String
   lockToken        String
-  expiresAt        DateTime
   updatedAt        DateTime @updatedAt
 
   patientSession PatientSession @relation(fields: [patientSessionId], references: [id], onDelete: Cascade)
   lockedBy       Profile        @relation("ProfileEditLocks", fields: [lockedByUserId], references: [id], onDelete: Restrict)
 
   @@unique([patientSessionId, formType])
-  @@index([expiresAt])
   @@index([updatedAt])
 }
