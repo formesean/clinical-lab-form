@@ -22,6 +22,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import Link from "next/link";
 
 export default function Home() {
   const router = useRouter();
@@ -96,6 +97,16 @@ export default function Home() {
               Login
             </Button>
           </form>
+
+          <div className="mt-4 text-center text-sm text-[#111827]">
+            Don't have an account?{" "}
+            <Link
+              href="/register"
+              className="text-[#135A39] font-semibold hover:underline"
+            >
+              Sign up
+            </Link>
+          </div>
         </CardContent>
       </Card>
     </div >
