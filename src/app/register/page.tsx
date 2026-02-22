@@ -29,14 +29,18 @@ export default function Home() {
   const [fullName, setFullName] = useState<string>("")
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [userIdNum, setUserIdNum] = useState<string>("");
   const [licenseNum, setLicenseNum] = useState<string>("");
   const [firstName, setFirstName] = useState<string>("");
   const [middleName, setMiddleName] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
+  const [passwordError, setPasswordError] = useState<string>("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (password !== confirmPassword) return;
 
     try {
       const authSignup = await fetch("/api/auth/signup", {
@@ -161,9 +165,23 @@ export default function Home() {
               />
             </div>
 
+            <div className="flex flex-col space-y-1.5">
+              <Label htmlFor="confirmPassword" className="text-[#111827] placeholder:text-[#9CA3AF]">Confirm Password</Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                className="text-[#111827] placeholder:text-[#9CA3AF] selection:bg-[#135A39] selection:text-white"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+              />
+              {(confirmPassword && confirmPassword !== password) && (
+                <span className="text-red-600 text-sm mt-1">Passwords do not match</span>
+              )}
+            </div>
+
             <Button
               type="submit"
-              className="w-full bg-[#135A39] text-white hover:bg-[#0f4030] mt-2">
+              className="w-full bg-[#135A39] text-white hover:bg-[#0f4030] mt-2 hover:cursor-pointer">
               Create Account
             </Button>
           </form>
