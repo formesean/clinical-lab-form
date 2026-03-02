@@ -8,7 +8,6 @@ import {
   ComboboxContent,
   ComboboxList,
   ComboboxItem,
-  ComboboxValue,
 } from "@/components/ui/combobox";
 
 type InputType = "number" | "text" | "combobox";
@@ -44,6 +43,8 @@ type FieldMap = {
   }>;
 };
 
+type MedTechEntry = { fullName: string; licenseNum: string };
+
 type Props = {
   map: FieldMap;
   page: number;
@@ -53,7 +54,30 @@ type Props = {
   onChange: (key: string, value: string) => void;
   isEditable?: boolean;
   chemUnitMode?: "CU" | "SI";
+  medtechs?: MedTechEntry[];
 };
+
+// Shared visual tokens — single source of truth for all field types
+const FIELD_BG = "bg-[#E6F3ED]";
+const FIELD_BORDER = "border border-[#135A39]/40";
+const FIELD_TEXT_ACTIVE = "text-[#111827]";
+const FIELD_TEXT_DISABLED = "text-[#6B9080]";
+const FIELD_PLACEHOLDER = "placeholder:text-[#6B9080]";
+const FIELD_DISABLED_BASE = "disabled:cursor-not-allowed disabled:opacity-100";
+
+const COMBOBOX_FIELD_CLASS = [
+  `!h-full !min-h-0 !shadow-none rounded-md`,
+  `${FIELD_BG} ${FIELD_BORDER}`,
+  `text-center ${FIELD_TEXT_ACTIVE} ${FIELD_PLACEHOLDER}`,
+  `${FIELD_DISABLED_BASE} disabled:${FIELD_TEXT_DISABLED}`,
+  // inner <input> sizing/alignment
+  "[&_input]:!h-full [&_input]:!min-h-0 [&_input]:px-1 [&_input]:py-0",
+  "[&_input]:!text-[10px] [&_input]:leading-tight [&_input]:text-center",
+  // inner <input> text color — active vs disabled
+  `[&_input]:${FIELD_TEXT_ACTIVE} [&_input]:disabled:${FIELD_TEXT_DISABLED}`,
+  // keep trigger visually aligned with mapped fields
+  "[&_[data-slot=input-group-addon]]:pr-1 [&_[data-slot=input-group-button]]:h-full [&_[data-slot=input-group-button]]:rounded-sm [&_[data-slot=input-group-button]]:hover:bg-transparent",
+].join(" ");
 
 /**
  * Renders input fields over the PDF/image exactly like the mapper renders boxes.
@@ -68,7 +92,14 @@ export function FieldOverlay({
   onChange,
   isEditable = true,
   chemUnitMode,
+  medtechs,
 }: Props) {
+  const medtechByName = useMemo(() => {
+    if (!medtechs?.length) return null;
+    const m = new Map<string, string>();
+    for (const mt of medtechs) m.set(mt.fullName, mt.licenseNum);
+    return m;
+  }, [medtechs]);
   const fields = useMemo(
     () => map.fields.filter((f) => f.page === page),
     [map, page]
@@ -103,7 +134,11 @@ export function FieldOverlay({
           height: `${height}px`,
         };
 
-        const fieldClassName = "text-center absolute h-auto text-xs px-1 py-0 bg-[#E6F3ED] border border-[#135A39]/40 text-[#111827] placeholder:text-[#6B9080]";
+        const baseFieldClassName = [
+          "text-center absolute h-auto !text-[10px] leading-tight px-1 py-0",
+          FIELD_BG, FIELD_BORDER, FIELD_TEXT_ACTIVE, FIELD_PLACEHOLDER,
+          FIELD_DISABLED_BASE, `disabled:${FIELD_TEXT_DISABLED}`,
+        ].join(" ");
 
         const inputType = f.inputType ?? "text";
         const currentValue = values[f.key] ?? "";
@@ -119,12 +154,52 @@ export function FieldOverlay({
         const isChemUnitDisabled =
           !!chemUnitMode &&
           (chemUnitMode === "CU" ? isChemSuVal : isChemCuVal);
+        const isPerfByName = lowerKey.endsWith(".perfbyname");
+        const isPerfByLic = lowerKey.endsWith(".perfbylic");
+        const hasMedtechs = !!medtechByName && medtechByName.size > 0;
+        const isPerfByLicLocked = isPerfByLic && hasMedtechs;
         const isDisabled =
           !isEditable ||
           isFlagField ||
           isPatientField ||
           isRequisitionField ||
           isChemUnitDisabled;
+
+        const fieldClassName = `${baseFieldClassName} bg-[#E6F3ED]`;
+
+        if (isPerfByName && hasMedtechs) {
+          const prefix = f.key.slice(0, f.key.lastIndexOf("."));
+          const licKey = `${prefix}.perfByLic`;
+          return (
+            <div key={`${f.page}:${f.key}`} className="absolute" style={fieldStyle}>
+              <Combobox
+                value={currentValue}
+                onValueChange={(value) => {
+                  if (!isEditable) return;
+                  const name = value ?? "";
+                  onChange(f.key, name);
+                  const lic = medtechByName.get(name) ?? "";
+                  onChange(licKey, lic);
+                }}
+                disabled={!isEditable}
+              >
+                <ComboboxInput
+                  className={COMBOBOX_FIELD_CLASS}
+                  disabled={!isEditable}
+                />
+                <ComboboxContent>
+                  <ComboboxList>
+                    {Array.from(medtechByName.keys()).map((name) => (
+                      <ComboboxItem key={name} value={name}>
+                        {name}
+                      </ComboboxItem>
+                    ))}
+                  </ComboboxList>
+                </ComboboxContent>
+              </Combobox>
+            </div>
+          );
+        }
 
         // Render Combobox for combobox input type
         if (inputType === "combobox" && f.comboboxItems && f.comboboxItems.length > 0) {
@@ -139,7 +214,7 @@ export function FieldOverlay({
                 disabled={isDisabled}
               >
                 <ComboboxInput
-                  className="h-full text-xs bg-[#E6F3ED] border border-[#135A39]/40 text-[#111827] placeholder:text-[#6B9080] disabled:cursor-not-allowed disabled:opacity-60 [&_input]:h-full [&_input]:px-1 [&_input]:py-0 [&_input]:text-xs"
+                  className={COMBOBOX_FIELD_CLASS}
                   disabled={isDisabled}
                 />
                 <ComboboxContent>
@@ -164,12 +239,13 @@ export function FieldOverlay({
             type={isNumericInput ? "text" : "text"}
             inputMode={isNumericInput ? "decimal" : undefined}
             pattern={isNumericInput ? "[0-9]*[.,]?[0-9]*" : undefined}
-            className={`${fieldClassName} disabled:cursor-not-allowed disabled:opacity-60`}
+            className={fieldClassName}
             style={fieldStyle}
             value={currentValue}
             disabled={isDisabled}
+            readOnly={isPerfByLicLocked}
             onChange={(e) => {
-              if (isDisabled) return;
+              if (isDisabled || isPerfByLicLocked) return;
               onChange(f.key, e.target.value);
             }}
           />

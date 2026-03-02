@@ -32,6 +32,8 @@ type Fieldmap = {
   }>;
 };
 
+type MedTechEntry = { fullName: string; licenseNum: string };
+
 type Props = {
   formType: string;
   values: Record<string, string>;
@@ -42,6 +44,7 @@ type Props = {
   patientCreatedAt?: string | null;
   patientAgeYears?: number | null;
   chemUnitMode?: "CU" | "SI";
+  medtechs?: MedTechEntry[];
 };
 
 type PatientContext = {
@@ -151,6 +154,7 @@ export function FormTemplateViewer({
   patientCreatedAt,
   patientAgeYears,
   chemUnitMode,
+  medtechs,
 }: Props) {
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [fieldmap, setFieldmap] = useState<Fieldmap | null>(null);
@@ -312,6 +316,7 @@ export function FormTemplateViewer({
                 onChange={onChange}
                 isEditable={isEditable}
                 chemUnitMode={chemUnitMode}
+                medtechs={medtechs}
               />
             )}
         </div>
