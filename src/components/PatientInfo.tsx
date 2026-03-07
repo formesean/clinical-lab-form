@@ -22,6 +22,8 @@ type PatientIdProp = {
   selectedPatientId: string | null;
 };
 
+type MedTechEntry = { fullName: string; licenseNum: string };
+
 type FormValuesState = Record<string, Record<string, string>>;
 
 const FORM_ORDER = [
@@ -46,6 +48,7 @@ export default function PatientInfo({ selectedPatientId }: PatientIdProp) {
   const [lockTokens, setLockTokens] = useState<Record<string, string>>({});
   const [chemUnitMode, setChemUnitMode] = useState<"CU" | "SI">("CU");
   const lastLockedFormRef = useRef<string | null>(null);
+  const [medtechs, setMedtechs] = useState<MedTechEntry[]>([]);
 
   const fetchPatientInfo = async (id: string) => {
     try {
@@ -82,6 +85,23 @@ export default function PatientInfo({ selectedPatientId }: PatientIdProp) {
     lastLockedFormRef.current = null;
     setChemUnitMode("CU");
   }, [selectedPatientId]);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/medtechs");
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!cancelled && Array.isArray(data.medtechs)) {
+          setMedtechs(data.medtechs);
+        }
+      } catch {
+        // silently ignore
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   const orderedForms = patientInfo?.requestedForms
     ? [...patientInfo.requestedForms].sort((a, b) => {
@@ -350,7 +370,7 @@ export default function PatientInfo({ selectedPatientId }: PatientIdProp) {
   }, [activeFormType, isEditing, lockTokens, orderedForms, patientInfo]);
 
   return (
-    <div>
+    <div className="flex h-full min-h-0 flex-col w-full">
       {!selectedPatientId ? (
         <div className="flex flex-1 items-center justify-center p-8 text-muted-foreground">
           Select a patient to view details
@@ -386,11 +406,11 @@ export default function PatientInfo({ selectedPatientId }: PatientIdProp) {
             </CardDescription>
             <Separator />
           </CardHeader>
-          <CardContent className="min-h-0 overflow-hidden flex flex-col">
+          <CardContent className="flex-1 min-h-0 flex flex-col overflow-hidden">
             {patientInfo && patientInfo.requestedForms.length > 0 && (
-              <div className="mt-3">
-                <Tabs value={activeFormType ?? orderedForms[0]} onValueChange={setActiveFormType}>
-                  <div className="flex justify-between items-center">
+              <div className="mt-3 flex flex-col flex-1 min-h-0">
+                <Tabs value={activeFormType ?? orderedForms[0]} onValueChange={setActiveFormType} className="flex flex-col flex-1 min-h-0">
+                  <div className="flex justify-between items-center flex-shrink-0">
                     <TabsList>
                       {orderedForms.map((formType) => (
                         <TabsTrigger key={formType} value={formType} className="hover:cursor-pointer">
@@ -441,7 +461,7 @@ export default function PatientInfo({ selectedPatientId }: PatientIdProp) {
                   </div>
 
                   {orderedForms.map((formType) => (
-                    <TabsContent key={formType} value={formType}>
+                    <TabsContent key={formType} value={formType} className="flex-1 min-h-0 overflow-auto mt-2">
                       <Card className="p-0">
                         <CardContent className="p-0 pt-7 flex items-center justify-center w-full">
                           <FormTemplateViewer
@@ -462,6 +482,7 @@ export default function PatientInfo({ selectedPatientId }: PatientIdProp) {
                             patientCreatedAt={patientInfo?.createdAt}
                             patientAgeYears={patientInfo?.age}
                             chemUnitMode={activeFormType === "CHEM" ? chemUnitMode : undefined}
+                            medtechs={medtechs}
                             onChange={(key, value) =>
                               setFormValues((prev) => ({
                                 ...prev,

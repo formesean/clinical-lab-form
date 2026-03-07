@@ -22,6 +22,7 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from "./ui/hover-card"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "./ui/select"
 import { Field, FieldContent, FieldDescription, FieldGroup, FieldLabel, FieldTitle } from "./ui/field"
 import { Checkbox } from "./ui/checkbox"
+import { cleanupStaleScrollLock } from "@/lib/scroll-lock"
 
 const PATIENT_ID_PREFIX = "DCVCL-"
 const MONTHS_BY_SHORT_NAME: Record<string, number> = {
@@ -232,7 +233,12 @@ export default function AddPatient() {
     }
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog open={open} onOpenChange={(nextOpen) => {
+            setOpen(nextOpen);
+            if (!nextOpen) {
+                requestAnimationFrame(cleanupStaleScrollLock);
+            }
+        }}>
             <DialogTrigger>
                 <div>
                     <div className="flex items-center space-x-2 text-[#135A39] whitespace-nowrap hover:cursor-pointer">

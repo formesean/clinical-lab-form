@@ -158,7 +158,7 @@ export default function NavBar() {
                         <p className="font-semibold text-[#111827]">{dateStr}, {timeStr}</p>
                     </div>
                 </div>
-                <DropdownMenu>
+                <DropdownMenu modal={false}>
                     <DropdownMenuTrigger asChild>
                         <CircleUserRound className="size-9 hover:cursor-pointer" />
                     </DropdownMenuTrigger>
@@ -179,9 +179,14 @@ export default function NavBar() {
                                 </HoverCardContent>
                             </HoverCard>
                             {isAdmin ? (
-                                <DropdownMenuItem asChild className="hover:cursor-pointer">
-                                    <a href="/admin/mapper">Mapper</a>
-                                </DropdownMenuItem>
+                                <>
+                                    <DropdownMenuItem asChild className="hover:cursor-pointer">
+                                        <a href="/admin/mapper">Mapper</a>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem asChild className="hover:cursor-pointer">
+                                        <a href="/admin/medtechs">MedTechs</a>
+                                    </DropdownMenuItem>
+                                </>
                             ) : null}
                         </DropdownMenuGroup>
                         <DropdownMenuGroup>
