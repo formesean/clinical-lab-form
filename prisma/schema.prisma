@@ -1,0 +1,130 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+enum AccountStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum FormType {
+  CHEM
+  OGTT
+  CBC
+  BT
+  UA
+  SE
+  PT
+  OBT
+  IMMUNO
+  MICRO
+}
+
+enum Sex {
+  MALE
+  FEMALE
+}
+
+enum Status {
+  PENDING
+  COMPLETED
+}
+
+model Profile {
+  id         String        @id
+  userIdNum  String        @unique
+  licenseNum String        @unique
+  email      String        @unique
+  firstName  String?
+  middleName String?
+  lastName   String?
+  role       Role          @default(USER)
+  status     AccountStatus @default(PENDING)
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  patientSessions PatientSession[] @relation("ProfilePatientSessions")
+  formEditLocks   FormEditLock[]   @relation("ProfileEditLocks")
+}
+
+model PatientSession {
+  id                  String     @id @default(cuid())
+  createdByUserId     String
+  patientIdNum        String
+  lastName            String
+  firstName           String
+  middleName          String
+  dateOfBirth         String
+  age                 Int
+  sex                 Sex
+  requestingPhysician String?
+  requestedForms      FormType[]
+  status              Status     @default(PENDING)
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+
+  createdBy Profile @relation("ProfilePatientSessions", fields: [createdByUserId], references: [id], onDelete: Restrict)
+
+  labForms      LabForm[]
+  formEditLocks FormEditLock[]
+
+  @@index([patientIdNum])
+  @@index([lastName, firstName])
+  @@index([createdByUserId])
+  @@index([updatedAt])
+}
+
+model LabForm {
+  id               String   @id @default(cuid())
+  patientSessionId String
+  formType         FormType
+  data             Json     @default("{}")
+  version          Int      @default(1)
+  status           Status   @default(PENDING)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  patientSession PatientSession @relation(fields: [patientSessionId], references: [id], onDelete: Cascade)
+
+  @@unique([patientSessionId, formType])
+  @@index([updatedAt])
+}
+
+model MedTech {
+  id         String   @id @default(cuid())
+  fullName   String
+  licenseNum String   @unique
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model FormEditLock {
+  id               String   @id @default(cuid())
+  patientSessionId String
+  formType         FormType
+  lockedByUserId   String
+  lockToken        String
+  updatedAt        DateTime @updatedAt
+
+  patientSession PatientSession @relation(fields: [patientSessionId], references: [id], onDelete: Cascade)
+  lockedBy       Profile        @relation("ProfileEditLocks", fields: [lockedByUserId], references: [id], onDelete: Restrict)
+
+  @@unique([patientSessionId, formType])
+  @@index([updatedAt])
+}
