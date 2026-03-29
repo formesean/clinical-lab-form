@@ -1,4 +1,12 @@
+import type { FormType } from "@prisma/client";
+import { Download, FileText, LoaderCircle } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { applyInputRules } from "@/lib/form-inputs";
+import { buildRequisitionDefaults, formatDisplayDate } from "@/lib/lab-forms";
+import type { PatientDTO } from "@/types/api/patients";
+import { FormTemplateViewer } from "./FormTemplateViewer";
+import { Button } from "./ui/button";
+import { ButtonGroup } from "./ui/button-group";
 import {
   Card,
   CardContent,
@@ -9,14 +17,7 @@ import {
 } from "./ui/card";
 import { Separator } from "./ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
-import type { FormType } from "@prisma/client";
-import { PatientDTO } from "@/types/api/patients";
-import { applyInputRules } from "@/lib/form-inputs";
-import { buildRequisitionDefaults, formatDisplayDate } from "@/lib/lab-forms";
-import { FormTemplateViewer } from "./FormTemplateViewer";
-import { ButtonGroup } from "./ui/button-group";
-import { Button } from "./ui/button";
-import { Download } from "lucide-react";
+import { Toast } from "./ui/toast";
 
 type PatientIdProp = {
   selectedPatientId: string | null;
@@ -42,10 +43,14 @@ export default function PatientInfo({ selectedPatientId }: PatientIdProp) {
   const [formValues, setFormValues] = useState<FormValuesState>({});
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isExportingPdf, setIsExportingPdf] = useState(false);
   const [activeFormType, setActiveFormType] = useState<string | null>(null);
   const [lockTokens, setLockTokens] = useState<Record<string, string>>({});
   const [chemUnitMode, setChemUnitMode] = useState<"CU" | "SI">("CU");
   const lastLockedFormRef = useRef<string | null>(null);
+  const [toastMessage, setToastMessage] = useState("");
+  const [showToast, setShowToast] = useState(false);
+  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const fetchPatientInfo = async (id: string) => {
     try {
@@ -85,18 +90,18 @@ export default function PatientInfo({ selectedPatientId }: PatientIdProp) {
 
   const orderedForms = patientInfo?.requestedForms
     ? [...patientInfo.requestedForms].sort((a, b) => {
-      const aIndex = FORM_ORDER.indexOf(a as (typeof FORM_ORDER)[number]);
-      const bIndex = FORM_ORDER.indexOf(b as (typeof FORM_ORDER)[number]);
+        const aIndex = FORM_ORDER.indexOf(a as (typeof FORM_ORDER)[number]);
+        const bIndex = FORM_ORDER.indexOf(b as (typeof FORM_ORDER)[number]);
 
-      const safeAIndex = aIndex === -1 ? Number.POSITIVE_INFINITY : aIndex;
-      const safeBIndex = bIndex === -1 ? Number.POSITIVE_INFINITY : bIndex;
+        const safeAIndex = aIndex === -1 ? Number.POSITIVE_INFINITY : aIndex;
+        const safeBIndex = bIndex === -1 ? Number.POSITIVE_INFINITY : bIndex;
 
-      if (safeAIndex !== safeBIndex) {
-        return safeAIndex - safeBIndex;
-      }
+        if (safeAIndex !== safeBIndex) {
+          return safeAIndex - safeBIndex;
+        }
 
-      return a.localeCompare(b);
-    })
+        return a.localeCompare(b);
+      })
     : [];
 
   const handleEditToggle = async () => {
@@ -135,21 +140,21 @@ export default function PatientInfo({ selectedPatientId }: PatientIdProp) {
 
   const patientFieldValues: Record<string, string> = patientInfo
     ? {
-      "patient.patientIdNum": patientInfo.patientIdNum ?? "",
-      "patient.lastName": patientInfo.lastName ?? "",
-      "patient.firstName": patientInfo.firstName ?? "",
-      "patient.middleName": patientInfo.middleName ?? "",
-      "patient.dateOfBirth": (() => {
-        if (!patientInfo.dateOfBirth) return "";
-        const parsed = new Date(patientInfo.dateOfBirth);
-        return Number.isNaN(parsed.getTime())
-          ? patientInfo.dateOfBirth
-          : formatDisplayDate(parsed);
-      })(),
-      "patient.age": String(patientInfo.age ?? ""),
-      "patient.sex": patientInfo.sex ?? "",
-      "patient.requestingPhysician": patientInfo.requestingPhysician ?? "",
-    }
+        "patient.patientIdNum": patientInfo.patientIdNum ?? "",
+        "patient.lastName": patientInfo.lastName ?? "",
+        "patient.firstName": patientInfo.firstName ?? "",
+        "patient.middleName": patientInfo.middleName ?? "",
+        "patient.dateOfBirth": (() => {
+          if (!patientInfo.dateOfBirth) return "";
+          const parsed = new Date(patientInfo.dateOfBirth);
+          return Number.isNaN(parsed.getTime())
+            ? patientInfo.dateOfBirth
+            : formatDisplayDate(parsed);
+        })(),
+        "patient.age": String(patientInfo.age ?? ""),
+        "patient.sex": patientInfo.sex ?? "",
+        "patient.requestingPhysician": patientInfo.requestingPhysician ?? "",
+      }
     : {};
 
   const handleDownload = async () => {
@@ -161,7 +166,10 @@ export default function PatientInfo({ selectedPatientId }: PatientIdProp) {
     const unit = chemUnitMode === "SI" ? "si" : "conv";
     const dataToExport = {
       ...(patientInfo
-        ? buildRequisitionDefaults(formType as FormType, new Date(patientInfo.createdAt))
+        ? buildRequisitionDefaults(
+            formType as FormType,
+            new Date(patientInfo.createdAt),
+          )
         : {}),
       ...(formValues[formType] ?? {}),
       ...patientFieldValues,
@@ -192,6 +200,85 @@ export default function PatientInfo({ selectedPatientId }: PatientIdProp) {
     a.download = match?.[1] ?? `${formType}_${unit}.xlsx`;
     a.click();
     URL.revokeObjectURL(url);
+  };
+
+  const showToastMessage = (message: string) => {
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    setToastMessage(message);
+    setShowToast(true);
+    toastTimerRef.current = setTimeout(() => setShowToast(false), 4000);
+  };
+
+  useEffect(
+    () => () => {
+      if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    },
+    [],
+  );
+
+  const handleDownloadPdf = async () => {
+    if (!patientInfo) return;
+    const formType = activeFormType ?? orderedForms[0];
+    if (!formType) return;
+    if (formType !== "CHEM") return;
+
+    const unit = chemUnitMode === "SI" ? "si" : "conv";
+    const dataToExport = {
+      ...(patientInfo
+        ? buildRequisitionDefaults(
+            formType as FormType,
+            new Date(patientInfo.createdAt),
+          )
+        : {}),
+      ...(formValues[formType] ?? {}),
+      ...patientFieldValues,
+    };
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 25000);
+
+    try {
+      setIsExportingPdf(true);
+      const res = await fetch("/api/forms/export-pdf/chem", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          formType,
+          sex: patientInfo.sex,
+          unit,
+          data: dataToExport,
+        }),
+        signal: controller.signal,
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => null);
+        if (res.status === 503 || err?.error?.code === "QUOTA_EXHAUSTED") {
+          showToastMessage("PDF quota exhausted — downloading Excel instead.");
+          void handleDownload();
+          return;
+        }
+        console.error(err?.error ?? "Failed to export PDF");
+        showToastMessage("PDF conversion failed. Please try again.");
+        return;
+      }
+
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      const disposition = res.headers.get("Content-Disposition") ?? "";
+      const match = disposition.match(/filename="([^"]+)"/);
+      a.href = url;
+      a.download = match?.[1] ?? `${formType}_${unit}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      showToastMessage("PDF request timed out — downloading Excel instead.");
+      void handleDownload();
+    } finally {
+      clearTimeout(timeoutId);
+      setIsExportingPdf(false);
+    }
   };
 
   useEffect(() => {
@@ -240,9 +327,15 @@ export default function PatientInfo({ selectedPatientId }: PatientIdProp) {
       if (!res.ok || !data?.forms || cancelled) return;
 
       const nextValues: FormValuesState = {};
-      for (const form of data.forms as Array<{ formType: string; data?: Record<string, unknown> }>) {
+      for (const form of data.forms as Array<{
+        formType: string;
+        data?: Record<string, unknown>;
+      }>) {
         const raw = form.data && typeof form.data === "object" ? form.data : {};
-        const entries = Object.entries(raw).map(([k, v]) => [k, v == null ? "" : String(v)]);
+        const entries = Object.entries(raw).map(([k, v]) => [
+          k,
+          v == null ? "" : String(v),
+        ]);
         nextValues[form.formType] = Object.fromEntries(entries);
       }
       if (!cancelled) setFormValues(nextValues);
@@ -256,21 +349,29 @@ export default function PatientInfo({ selectedPatientId }: PatientIdProp) {
     if (!patientInfo) return {};
     const tokens: Record<string, string> = {};
     for (const formType of forms) {
-      const res = await fetch(`/api/patients/${patientInfo.id}/forms/${formType}/lock`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ lockToken: lockTokens[formType] }),
-      });
+      const res = await fetch(
+        `/api/patients/${patientInfo.id}/forms/${formType}/lock`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ lockToken: lockTokens[formType] }),
+        },
+      );
       const data = await res.json().catch(() => null);
       if (!res.ok || !data?.lockToken) {
-        throw new Error(data?.error?.message ?? `Failed to acquire lock for ${formType}`);
+        throw new Error(
+          data?.error?.message ?? `Failed to acquire lock for ${formType}`,
+        );
       }
       tokens[formType] = data.lockToken as string;
     }
     return tokens;
   };
 
-  const releaseLocks = async (forms: string[], tokens: Record<string, string>) => {
+  const releaseLocks = async (
+    forms: string[],
+    tokens: Record<string, string>,
+  ) => {
     if (!patientInfo) return;
     await Promise.all(
       forms.map((formType) =>
@@ -278,8 +379,8 @@ export default function PatientInfo({ selectedPatientId }: PatientIdProp) {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ lockToken: tokens[formType] }),
-        }).catch(() => null)
-      )
+        }).catch(() => null),
+      ),
     );
   };
 
@@ -288,19 +389,25 @@ export default function PatientInfo({ selectedPatientId }: PatientIdProp) {
     for (const formType of forms) {
       const dataToSave = {
         ...(patientInfo
-          ? buildRequisitionDefaults(formType as FormType, new Date(patientInfo.createdAt))
+          ? buildRequisitionDefaults(
+              formType as FormType,
+              new Date(patientInfo.createdAt),
+            )
           : {}),
         ...(formValues[formType] ?? {}),
         ...patientFieldValues,
       };
-      const res = await fetch(`/api/patients/${patientInfo.id}/forms/${formType}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          lockToken: tokens[formType],
-          data: dataToSave,
-        }),
-      });
+      const res = await fetch(
+        `/api/patients/${patientInfo.id}/forms/${formType}`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            lockToken: tokens[formType],
+            data: dataToSave,
+          }),
+        },
+      );
       const data = await res.json().catch(() => null);
       if (!res.ok) {
         throw new Error(data?.error?.message ?? `Failed to save ${formType}`);
@@ -374,13 +481,13 @@ export default function PatientInfo({ selectedPatientId }: PatientIdProp) {
                 Date Created:{" "}
                 {patientInfo?.createdAt
                   ? new Date(patientInfo.createdAt).toLocaleDateString(
-                    "en-PH",
-                    {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    }
-                  )
+                      "en-PH",
+                      {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      },
+                    )
                   : ""}
               </div>
             </CardDescription>
@@ -389,11 +496,18 @@ export default function PatientInfo({ selectedPatientId }: PatientIdProp) {
           <CardContent className="min-h-0 overflow-hidden flex flex-col">
             {patientInfo && patientInfo.requestedForms.length > 0 && (
               <div className="mt-3">
-                <Tabs value={activeFormType ?? orderedForms[0]} onValueChange={setActiveFormType}>
+                <Tabs
+                  value={activeFormType ?? orderedForms[0]}
+                  onValueChange={setActiveFormType}
+                >
                   <div className="flex justify-between items-center">
                     <TabsList>
                       {orderedForms.map((formType) => (
-                        <TabsTrigger key={formType} value={formType} className="hover:cursor-pointer">
+                        <TabsTrigger
+                          key={formType}
+                          value={formType}
+                          className="hover:cursor-pointer"
+                        >
                           {formType}
                         </TabsTrigger>
                       ))}
@@ -403,16 +517,28 @@ export default function PatientInfo({ selectedPatientId }: PatientIdProp) {
                         <ButtonGroup>
                           <Button
                             type="button"
-                            variant={chemUnitMode === "CU" ? "default" : "outline"}
-                            className={chemUnitMode === "CU" ? "bg-[#135A39] hover:bg-[#13AA39]" : ""}
+                            variant={
+                              chemUnitMode === "CU" ? "default" : "outline"
+                            }
+                            className={
+                              chemUnitMode === "CU"
+                                ? "bg-[#135A39] hover:bg-[#13AA39]"
+                                : ""
+                            }
                             onClick={() => setChemUnitMode("CU")}
                           >
                             Conv.
                           </Button>
                           <Button
                             type="button"
-                            variant={chemUnitMode === "SI" ? "default" : "outline"}
-                            className={chemUnitMode === "SI" ? "bg-[#135A39] hover:bg-[#13AA39]" : ""}
+                            variant={
+                              chemUnitMode === "SI" ? "default" : "outline"
+                            }
+                            className={
+                              chemUnitMode === "SI"
+                                ? "bg-[#135A39] hover:bg-[#13AA39]"
+                                : ""
+                            }
                             onClick={() => setChemUnitMode("SI")}
                           >
                             SI
@@ -433,8 +559,19 @@ export default function PatientInfo({ selectedPatientId }: PatientIdProp) {
                           variant="outline"
                           size="icon"
                           onClick={handleDownload}
+                          disabled={isExportingPdf}
                         >
                           <Download />
+                        </Button>
+                        <Button
+                          className="hover:cursor-pointer"
+                          variant="outline"
+                          size="icon"
+                          onClick={handleDownloadPdf}
+                          title="Download PDF"
+                          disabled={isExportingPdf}
+                        >
+                          <FileText />
                         </Button>
                       </ButtonGroup>
                     </div>
@@ -449,9 +586,9 @@ export default function PatientInfo({ selectedPatientId }: PatientIdProp) {
                             values={{
                               ...(patientInfo
                                 ? buildRequisitionDefaults(
-                                  formType as FormType,
-                                  new Date(patientInfo.createdAt),
-                                )
+                                    formType as FormType,
+                                    new Date(patientInfo.createdAt),
+                                  )
                                 : {}),
                               ...(formValues[formType] ?? {}),
                               ...patientFieldValues,
@@ -461,7 +598,11 @@ export default function PatientInfo({ selectedPatientId }: PatientIdProp) {
                             patientDateOfBirth={patientInfo?.dateOfBirth}
                             patientCreatedAt={patientInfo?.createdAt}
                             patientAgeYears={patientInfo?.age}
-                            chemUnitMode={activeFormType === "CHEM" ? chemUnitMode : undefined}
+                            chemUnitMode={
+                              activeFormType === "CHEM"
+                                ? chemUnitMode
+                                : undefined
+                            }
                             onChange={(key, value) =>
                               setFormValues((prev) => ({
                                 ...prev,
@@ -488,6 +629,20 @@ export default function PatientInfo({ selectedPatientId }: PatientIdProp) {
           </CardContent>
         </>
       )}
+      {isExportingPdf && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 backdrop-blur-sm">
+          <div className="flex flex-col items-center gap-4 rounded-2xl bg-background px-8 py-7 shadow-2xl">
+            <LoaderCircle className="size-12 animate-spin text-[#135A39]" />
+            <div className="text-center">
+              <p className="font-semibold text-foreground">Generating PDF</p>
+              <p className="text-sm text-muted-foreground">
+                Please wait while we prepare your file.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+      <Toast message={toastMessage} visible={showToast} variant="warning" />
     </div>
   );
 }

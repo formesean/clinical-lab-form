@@ -3,14 +3,19 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "prisma:generate": "prisma generate",
+    "predev": "pnpm prisma:generate",
     "dev": "next dev",
-    "build": "prisma generate && next build",
+    "prebuild": "pnpm prisma:generate",
+    "build": "next build",
     "start": "next start",
+    "postinstall": "pnpm prisma:generate",
     "lint": "biome check",
     "format": "biome format --write"
   },
   "dependencies": {
     "@base-ui/react": "^1.1.0",
+    "@ilovepdf/ilovepdf-nodejs": "^0.3.1",
     "@prisma/adapter-pg": "^7.3.0",
     "@prisma/client": "^7.3.0",
     "@prisma/client-runtime-utils": "^7.3.0",
