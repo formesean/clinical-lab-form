@@ -289,13 +289,7 @@
       "wPct": 0.14902,
       "hPct": 0.017172,
       "inputType": "combobox",
-      "comboboxItems": [
-        "CLEAR",
-        "SLIGHTLY CLOUDY",
-        "CLOUDY",
-        "TURBID",
-        "MILKY"
-      ]
+      "comboboxItems": ["CLEAR", "SLIGHTLY CLOUDY", "CLOUDY", "TURBID", "MILKY"]
     },
     {
       "key": "ua.leu_res",
@@ -309,12 +303,7 @@
       "wPct": 0.14902,
       "hPct": 0.017172,
       "inputType": "combobox",
-      "comboboxItems": [
-        "NEGATIVE",
-        "25 (+)",
-        "75 (++)",
-        "500 (+++)"
-      ]
+      "comboboxItems": ["NEGATIVE", "25 (+)", "75 (++)", "500 (+++)"]
     },
     {
       "key": "ua.nit_res",
@@ -322,17 +311,13 @@
       "xPx": 346,
       "yPx": 470,
       "wPx": 114,
-      "hPx": 16,
+      "hPx": 17,
       "xPct": 0.452288,
       "yPct": 0.474747,
       "wPct": 0.14902,
-      "hPct": 0.016162,
+      "hPct": 0.017172,
       "inputType": "combobox",
-      "comboboxItems": [
-        "NEGATIVE",
-        "TRACE (+/-)",
-        ">0.5 (+)"
-      ]
+      "comboboxItems": ["NEGATIVE", "TRACE (+/-)", ">0.5 (+)"]
     },
     {
       "key": "ua.uro_res",
@@ -387,15 +372,7 @@
       "wPct": 0.14902,
       "hPct": 0.017172,
       "inputType": "combobox",
-      "comboboxItems": [
-        "5.0",
-        "6.0",
-        "6.5",
-        "7.0",
-        "7.5",
-        "8.0",
-        "9.0"
-      ]
+      "comboboxItems": ["5.0", "6.0", "6.5", "7.0", "7.5", "8.0", "9.0"]
     },
     {
       "key": "ua.bld_res",
@@ -409,12 +386,7 @@
       "wPct": 0.14902,
       "hPct": 0.017172,
       "inputType": "combobox",
-      "comboboxItems": [
-        "NEGATIVE",
-        "10 (+)",
-        "50 (++)",
-        "250 (+++)"
-      ]
+      "comboboxItems": ["NEGATIVE", "10 (+)", "50 (++)", "250 (+++)"]
     },
     {
       "key": "ua.sg_res",
@@ -450,13 +422,7 @@
       "wPct": 0.14902,
       "hPct": 0.017172,
       "inputType": "combobox",
-      "comboboxItems": [
-        "NEGATIVE",
-        "5 (+/-)",
-        "10 (+)",
-        "50 (++)",
-        "100 (+++)"
-      ]
+      "comboboxItems": ["NEGATIVE", "5 (+/-)", "10 (+)", "50 (++)", "100 (+++)"]
     },
     {
       "key": "ua.bil_res",
@@ -470,12 +436,7 @@
       "wPct": 0.14902,
       "hPct": 0.017172,
       "inputType": "combobox",
-      "comboboxItems": [
-        "NEGATIVE",
-        "0.5 (+)",
-        "1.0 (++)",
-        "3.0 (+++)"
-      ]
+      "comboboxItems": ["NEGATIVE", "0.5 (+)", "1.0 (++)", "3.0 (+++)"]
     },
     {
       "key": "ua.glu_res",
@@ -532,7 +493,9 @@
       "xPct": 0.452288,
       "yPct": 0.680808,
       "wPct": 0.14902,
-      "hPct": 0.017172
+      "hPct": 0.017172,
+      "inputType": "combobox",
+      "comboboxItems": ["NONE", "RARE", "FEW", "MODERATE", "MANY", "ABUNDANT"]
     },
     {
       "key": "ua.muc_res",
@@ -544,7 +507,9 @@
       "xPct": 0.452288,
       "yPct": 0.69798,
       "wPct": 0.14902,
-      "hPct": 0.017172
+      "hPct": 0.017172,
+      "inputType": "combobox",
+      "comboboxItems": ["NONE", "RARE", "FEW", "MODERATE", "MANY", "ABUNDANT"]
     },
     {
       "key": "ua.cast_res",
@@ -568,7 +533,9 @@
       "xPct": 0.452288,
       "yPct": 0.732323,
       "wPct": 0.14902,
-      "hPct": 0.017172
+      "hPct": 0.017172,
+      "inputType": "combobox",
+      "comboboxItems": ["NONE", "RARE", "FEW", "MODERATE", "MANY", "ABUNDANT"]
     },
     {
       "key": "ua.yea_res",
@@ -580,7 +547,9 @@
       "xPct": 0.452288,
       "yPct": 0.749495,
       "wPct": 0.14902,
-      "hPct": 0.017172
+      "hPct": 0.017172,
+      "inputType": "combobox",
+      "comboboxItems": ["NONE", "RARE", "FEW", "MODERATE", "MANY", "ABUNDANT"]
     },
     {
       "key": "ua.par_res",
@@ -592,19 +561,9 @@
       "xPct": 0.452288,
       "yPct": 0.766667,
       "wPct": 0.14902,
-      "hPct": 0.017172
-    },
-    {
-      "key": "ua.crys_res",
-      "page": 1,
-      "xPx": 346,
-      "yPx": 784,
-      "wPx": 114,
-      "hPx": 17,
-      "xPct": 0.452288,
-      "yPct": 0.791919,
-      "wPct": 0.14902,
-      "hPct": 0.017172
+      "hPct": 0.017172,
+      "inputType": "combobox",
+      "comboboxItems": ["NONE", "RARE", "FEW", "MODERATE", "MANY", "ABUNDANT"]
     },
     {
       "key": "ua.oth_res",
@@ -616,7 +575,9 @@
       "xPct": 0.452288,
       "yPct": 0.819192,
       "wPct": 0.14902,
-      "hPct": 0.017172
+      "hPct": 0.017172,
+      "inputType": "combobox",
+      "comboboxItems": ["NONE", "RARE", "FEW", "MODERATE", "MANY", "ABUNDANT"]
     },
     {
       "key": "ua.bld_id",
@@ -630,10 +591,7 @@
       "wPct": 0.132026,
       "hPct": 0.017172,
       "inputType": "combobox",
-      "comboboxItems": [
-        "(NON-HEMOLYSED)",
-        "(HEMOLYSED)"
-      ]
+      "comboboxItems": ["(NON-HEMOLYSED)", "(HEMOLYSED)"]
     },
     {
       "key": "ua.rbc_id",
@@ -675,16 +633,44 @@
       ]
     },
     {
-      "key": "ua.crys_id",
+      "key": "ua.crys1_id",
       "page": 1,
       "xPx": 233,
-      "yPx": 784,
+      "yPx": 776,
       "wPx": 101,
       "hPx": 17,
       "xPct": 0.304575,
-      "yPct": 0.791919,
+      "yPct": 0.783838,
       "wPct": 0.132026,
-      "hPct": 0.017172
+      "hPct": 0.017172,
+      "inputType": "combobox",
+      "comboboxItems": [
+        "URIC ACID",
+        "AMORPHOUS URATES",
+        "CALCIUM OXALATE",
+        "AMORPHOUS PHOSPHATES",
+        "CALCIUM PHOSPHATE",
+        "TRIPLE PHOSPHATE",
+        "AMMONIUM BIURATE",
+        "MONOSODIUM URATE",
+        "CALCIUM CARBONATE",
+        "CYSTINE",
+        "CHOLESTEROL",
+        "LEUCINE",
+        "TYROSINE",
+        "BILIRUBIN",
+        "ACETYLSULFADIAZINE",
+        "ACETYLSULFAMETHOXAZOLE",
+        "SULFADIAZINE",
+        "RADIOGRAPHIC DYE",
+        "AMPICILLIN",
+        "HEMATIN",
+        "HEMOSIDERIN",
+        "HIPPURIC ACID",
+        "INDIGOTIN",
+        "CALCIUM HYDROGEN PHOSPHATE",
+        "XANTHINE"
+      ]
     },
     {
       "key": "ua.cast_id",
@@ -696,7 +682,20 @@
       "xPct": 0.304575,
       "yPct": 0.715152,
       "wPct": 0.132026,
-      "hPct": 0.017172
+      "hPct": 0.017172,
+      "inputType": "combobox",
+      "comboboxItems": [
+        "HYALINE",
+        "RBC",
+        "WBC",
+        "BACTERIAL",
+        "EPITHELIAL CELL",
+        "FATTY",
+        "MIXED CELLULAR",
+        "GRANULAR",
+        "WAXY",
+        "BROAD"
+      ]
     },
     {
       "key": "ua.par_id",
@@ -708,7 +707,13 @@
       "xPct": 0.304575,
       "yPct": 0.766667,
       "wPct": 0.132026,
-      "hPct": 0.017172
+      "hPct": 0.017172,
+      "inputType": "combobox",
+      "comboboxItems": [
+        "T. vaginalis (troph.)",
+        "S. haematobium (ova)",
+        "E. histolytica"
+      ]
     },
     {
       "key": "ua.oth_id",
@@ -720,6 +725,261 @@
       "xPct": 0.304575,
       "yPct": 0.819192,
       "wPct": 0.132026,
+      "hPct": 0.017172,
+      "inputType": "combobox",
+      "comboboxItems": [
+        "FAT GLOBULES",
+        "TUMOR CELLS",
+        "VIRAL INCLUSION CELLS",
+        "PLATELETS"
+      ]
+    },
+    {
+      "key": "ua.col_id",
+      "page": 1,
+      "xPx": 233,
+      "yPx": 403,
+      "wPx": 101,
+      "hPx": 17,
+      "xPct": 0.304575,
+      "yPct": 0.407071,
+      "wPct": 0.132026,
+      "hPct": 0.017172
+    },
+    {
+      "key": "ua.clr_id",
+      "page": 1,
+      "xPx": 233,
+      "yPx": 420,
+      "wPx": 101,
+      "hPx": 17,
+      "xPct": 0.304575,
+      "yPct": 0.424242,
+      "wPct": 0.132026,
+      "hPct": 0.017172
+    },
+    {
+      "key": "ua.leu_id",
+      "page": 1,
+      "xPx": 233,
+      "yPx": 453,
+      "wPx": 101,
+      "hPx": 17,
+      "xPct": 0.304575,
+      "yPct": 0.457576,
+      "wPct": 0.132026,
+      "hPct": 0.017172
+    },
+    {
+      "key": "ua.nit_id",
+      "page": 1,
+      "xPx": 233,
+      "yPx": 470,
+      "wPx": 101,
+      "hPx": 17,
+      "xPct": 0.304575,
+      "yPct": 0.474747,
+      "wPct": 0.132026,
+      "hPct": 0.017172
+    },
+    {
+      "key": "ua.uro_id",
+      "page": 1,
+      "xPx": 233,
+      "yPx": 487,
+      "wPx": 101,
+      "hPx": 17,
+      "xPct": 0.304575,
+      "yPct": 0.491919,
+      "wPct": 0.132026,
+      "hPct": 0.017172
+    },
+    {
+      "key": "ua.pro_id",
+      "page": 1,
+      "xPx": 233,
+      "yPx": 504,
+      "wPx": 101,
+      "hPx": 17,
+      "xPct": 0.304575,
+      "yPct": 0.509091,
+      "wPct": 0.132026,
+      "hPct": 0.017172
+    },
+    {
+      "key": "ua.ph_id",
+      "page": 1,
+      "xPx": 233,
+      "yPx": 521,
+      "wPx": 101,
+      "hPx": 17,
+      "xPct": 0.304575,
+      "yPct": 0.526263,
+      "wPct": 0.132026,
+      "hPct": 0.017172
+    },
+    {
+      "key": "ua.sg_id",
+      "page": 1,
+      "xPx": 233,
+      "yPx": 556,
+      "wPx": 101,
+      "hPx": 17,
+      "xPct": 0.304575,
+      "yPct": 0.561616,
+      "wPct": 0.132026,
+      "hPct": 0.017172
+    },
+    {
+      "key": "ua.ket_id",
+      "page": 1,
+      "xPx": 233,
+      "yPx": 573,
+      "wPx": 101,
+      "hPx": 17,
+      "xPct": 0.304575,
+      "yPct": 0.578788,
+      "wPct": 0.132026,
+      "hPct": 0.017172
+    },
+    {
+      "key": "ua.bil_id",
+      "page": 1,
+      "xPx": 233,
+      "yPx": 590,
+      "wPx": 101,
+      "hPx": 17,
+      "xPct": 0.304575,
+      "yPct": 0.59596,
+      "wPct": 0.132026,
+      "hPct": 0.017172
+    },
+    {
+      "key": "ua.glu_id",
+      "page": 1,
+      "xPx": 233,
+      "yPx": 607,
+      "wPx": 101,
+      "hPx": 17,
+      "xPct": 0.304575,
+      "yPct": 0.613131,
+      "wPct": 0.132026,
+      "hPct": 0.017172
+    },
+    {
+      "key": "ua.wbc_id",
+      "page": 1,
+      "xPx": 233,
+      "yPx": 640,
+      "wPx": 101,
+      "hPx": 17,
+      "xPct": 0.304575,
+      "yPct": 0.646465,
+      "wPct": 0.132026,
+      "hPct": 0.017172
+    },
+    {
+      "key": "ua.muc_id",
+      "page": 1,
+      "xPx": 233,
+      "yPx": 691,
+      "wPx": 101,
+      "hPx": 17,
+      "xPct": 0.304575,
+      "yPct": 0.69798,
+      "wPct": 0.132026,
+      "hPct": 0.017172
+    },
+    {
+      "key": "ua.bac_id",
+      "page": 1,
+      "xPx": 233,
+      "yPx": 725,
+      "wPx": 101,
+      "hPx": 17,
+      "xPct": 0.304575,
+      "yPct": 0.732323,
+      "wPct": 0.132026,
+      "hPct": 0.017172
+    },
+    {
+      "key": "ua.yea_id",
+      "page": 1,
+      "xPx": 233,
+      "yPx": 742,
+      "wPx": 101,
+      "hPx": 17,
+      "xPct": 0.304575,
+      "yPct": 0.749495,
+      "wPct": 0.132026,
+      "hPct": 0.017172,
+      "inputType": "combobox",
+      "comboboxItems": ["BUDDING", "HYPHENATED"]
+    },
+    {
+      "key": "ua.crys1_res",
+      "page": 1,
+      "xPx": 346,
+      "yPx": 776,
+      "wPx": 114,
+      "hPx": 17,
+      "xPct": 0.452288,
+      "yPct": 0.783838,
+      "wPct": 0.14902,
+      "hPct": 0.017172,
+      "inputType": "combobox",
+      "comboboxItems": ["NONE", "RARE", "FEW", "MODERATE", "MANY", "ABUNDANT"]
+    },
+    {
+      "key": "ua.crys2_id",
+      "page": 1,
+      "xPx": 233,
+      "yPx": 793,
+      "wPx": 101,
+      "hPx": 17,
+      "xPct": 0.304575,
+      "yPct": 0.80101,
+      "wPct": 0.132026,
+      "hPct": 0.017172,
+      "inputType": "combobox",
+      "comboboxItems": [
+        "URIC ACID",
+        "AMORPHOUS URATES",
+        "CALCIUM OXALATE",
+        "AMORPHOUS PHOSPHATES",
+        "CALCIUM PHOSPHATE",
+        "TRIPLE PHOSPHATE",
+        "AMMONIUM BIURATE",
+        "MONOSODIUM URATE",
+        "CALCIUM CARBONATE",
+        "CYSTINE",
+        "CHOLESTEROL",
+        "LEUCINE",
+        "TYROSINE",
+        "BILIRUBIN",
+        "ACETYLSULFADIAZINE",
+        "ACETYLSULFAMETHOXAZOLE",
+        "SULFADIAZINE",
+        "RADIOGRAPHIC DYE",
+        "AMPICILLIN",
+        "HEMATIN",
+        "HEMOSIDERIN",
+        "HIPPURIC ACID",
+        "INDIGOTIN",
+        "CALCIUM HYDROGEN PHOSPHATE",
+        "XANTHINE"
+      ]
+    },
+    {
+      "key": "ua.crys2_res",
+      "page": 1,
+      "xPx": 346,
+      "yPx": 793,
+      "wPx": 114,
+      "hPx": 17,
+      "xPct": 0.452288,
+      "yPct": 0.80101,
+      "wPct": 0.14902,
       "hPct": 0.017172
     }
   ]
