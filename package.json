@@ -11,7 +11,9 @@
     "start": "next start",
     "postinstall": "pnpm prisma:generate",
     "lint": "biome check",
-    "format": "biome format --write"
+    "format": "biome format --write",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev -- --name"
   },
   "dependencies": {
     "@base-ui/react": "^1.1.0",

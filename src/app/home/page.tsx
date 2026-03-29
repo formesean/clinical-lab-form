@@ -30,12 +30,12 @@ export default function Home() {
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#E6F3ED]">
-      <NavBar></NavBar>
-      <div className="flex flex-1 overflow-hidden min-h-0">
-        <div className="flex flex-1 items-center px-20 gap-5 p-5 min-h-0 w-full">
-          <div className="flex-1 min-w-0 h-full flex flex-col">
-            <Card className="flex bg-white h-full w-full">
+    <div className="flex flex-col h-screen overflow-hidden bg-[#E6F3ED]">
+      <NavBar />
+      <div className="flex flex-1 min-h-0 overflow-hidden">
+        <div className="flex flex-1 items-stretch px-20 gap-5 p-5 min-h-0 w-full">
+          <div className="flex-1 min-w-0 min-h-0 flex flex-col">
+            <Card className="flex bg-white h-full w-full min-h-0">
               <CardHeader className="">
                 <div className="flex justify-between gap-10">
                   <AddPatient />
@@ -48,7 +48,7 @@ export default function Home() {
                 </div>
                 <Separator className="bg-[#DDEAE3]" />
               </CardHeader>
-              <CardContent className="flex-1 min-h-0 overflow-hidden flex flex-col px-5">
+              <CardContent className="flex-1 min-h-0 flex flex-col px-5 overflow-auto">
                 <ScrollArea className="flex-1 min-h-0">
                   <ScrollBar />
                   <PatientTable onRowClick={setSelectedPatientId} />
@@ -59,13 +59,13 @@ export default function Home() {
               </CardFooter>
             </Card>
           </div>
-          <div className="flex-2 min-w-0 h-full flex flex-col">
-            <Card className="flex bg-white h-full w-full">
+          <div className="flex-[2] min-w-0 min-h-0 flex flex-col">
+            <Card className="flex bg-white h-full w-full min-h-0 overflow-hidden">
               <PatientInfo selectedPatientId={selectedPatientId} />
             </Card>
           </div>
         </div>
       </div>
-    </div >
+    </div>
   );
 }

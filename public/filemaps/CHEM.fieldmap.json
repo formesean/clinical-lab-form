@@ -787,13 +787,13 @@
     {
       "key": "chem.perfByLic",
       "page": 1,
-      "xPx": 168,
+      "xPx": 165,
       "yPx": 895,
-      "wPx": 51,
+      "wPx": 55,
       "hPx": 18,
-      "xPct": 0.219608,
+      "xPct": 0.215686,
       "yPct": 0.90404,
-      "wPct": 0.066667,
+      "wPct": 0.071895,
       "hPct": 0.018182,
       "inputType": "number"
     },

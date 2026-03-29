@@ -590,7 +590,7 @@ export default function AdminMapperPage() {
   return (
     <div className="flex flex-col min-h-screen bg-[#E6F3ED]">
       <NavBar />
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 min-h-0 overflow-auto">
         <div className="flex flex-1 items-center px-20 gap-5 p-5 justify-start">
           <div className="flex-2/3 h-full">
             <Card className="flex bg-white h-full w-full">
