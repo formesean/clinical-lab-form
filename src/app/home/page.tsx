@@ -1,46 +1,45 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
+import { SearchIcon } from "lucide-react";
+import { useState } from "react";
+import AddPatient from "@/components/AddPatient";
 import NavBar from "@/components/NavBar";
+import PatientInfo from "@/components/PatientInfo";
+import PatientTable from "@/components/PatientTable";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { PlusCircleIcon, SlidersHorizontalIcon, ArrowDownNarrowWide, SearchIcon } from "lucide-react";
-import { Button } from "@/components/ui/button"
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableFooter,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Badge } from "@/components/ui/badge";
-import { string } from "zod";
-import PatientTable from "@/components/PatientTable";
-import AddPatient from "@/components/AddPatient";
-import type { PatientDTO } from "@/types/api/patients";
-import PatientInfo from "@/components/PatientInfo";
 
 export default function Home() {
-  const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
+  const [selectedPatientId, setSelectedPatientId] = useState<string | null>(
+    null,
+  );
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden bg-[#E6F3ED]">
+    <div className="min-h-screen bg-[#E6F3ED]">
       <NavBar />
-      <div className="flex flex-1 min-h-0 overflow-hidden">
-        <div className="flex flex-1 items-stretch px-20 gap-5 p-5 min-h-0 w-full">
-          <div className="flex-1 min-w-0 min-h-0 flex flex-col">
-            <Card className="flex bg-white h-full w-full min-h-0">
+      <div className="px-20 py-5">
+        <div className="flex w-full items-start gap-5">
+          <div className="flex min-w-0 flex-1 flex-col">
+            <Card className="flex min-h-[calc(100vh-6.75rem)] w-full flex-col bg-white">
               <CardHeader className="">
                 <div className="flex justify-between gap-10">
                   <AddPatient />
                   <InputGroup className="border-[#135A39]">
-                    <InputGroupInput placeholder="Search..." className="placeholder:text-[#9CA3AF] text-[#111827] selection:bg-[#135A39] selection:text-white" />
+                    <InputGroupInput
+                      placeholder="Search..."
+                      className="placeholder:text-[#9CA3AF] text-[#111827] selection:bg-[#135A39] selection:text-white"
+                    />
                     <InputGroupAddon>
                       <SearchIcon className="text-[#6B9080] " />
                     </InputGroupAddon>
@@ -54,13 +53,11 @@ export default function Home() {
                   <PatientTable onRowClick={setSelectedPatientId} />
                 </ScrollArea>
               </CardContent>
-              <CardFooter>
-
-              </CardFooter>
+              <CardFooter></CardFooter>
             </Card>
           </div>
-          <div className="flex-[2] min-w-0 min-h-0 flex flex-col">
-            <Card className="flex bg-white h-full w-full min-h-0 overflow-hidden">
+          <div className="flex min-w-0 flex-[2] flex-col">
+            <Card className="flex min-h-[calc(100vh-6.75rem)] w-full flex-col overflow-hidden bg-white">
               <PatientInfo selectedPatientId={selectedPatientId} />
             </Card>
           </div>
